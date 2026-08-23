@@ -69,8 +69,14 @@ DroneScanner-main/
 
 ## 许可证
 
-CC0 1.0（公共领域贡献宣告）
+CC BY-NC-ND 4.0（署名-非商业性使用-禁止演绎）
 
-在法律允许的最大范围内，作者已放弃本作品的全部著作权及相关权利。任何人可以自由使用、复制、修改、合并、发布与再分发本作品，无论是否用于商业目的，均无需署名或许可。
+本项目采用知识共享 署名-非商业性使用-禁止演绎 4.0 国际许可协议进行许可：
 
-许可证全文：<https://creativecommons.org/publicdomain/zero/1.0/legalcode>
+- **署名（BY）**：使用或分发时必须注明原作者及来源
+- **非商业性使用（NC）**：不得将本作品用于商业目的
+- **禁止演绎（ND）**：不得修改、转换或基于本作品二次创作，仅可原样分发
+
+许可证全文：<https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode>
+
+> 注：源码中内嵌的 OpenDroneID 相关文件（`opendroneid.c/.h`、`odid_wifi.h` 等）仍遵循其原始 Apache-2.0 许可证。

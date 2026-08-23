@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#000">
+<title>Remote ID 工具</title>
+<style>
+:root{--bg:#000;--layer:rgba(255,255,255,.18);--line:rgba(255,255,255,.15);--tx:#fff;--sub:rgba(255,255,255,.79);--faint:rgba(255,255,255,.54);--green:#6CCB5F;--red:#FF99A4;--accent:#4CC2FF;--shadow:0 2px 8px rgba(0,0,0,.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{overflow-x:hidden;-webkit-text-size-adjust:100%;background:#000}
+body{font-family:'Segoe UI Variable','Segoe UI','Microsoft YaHei UI','PingFang SC','Microsoft YaHei',system-ui,-apple-system,sans-serif;background:#000;color:#fff;min-height:100vh;-webkit-text-size-adjust:100%;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(900px 500px at 50% -5%,rgba(76,194,255,.07),transparent 60%);animation:bgPulse 6s ease-in-out infinite}
+@keyframes bgPulse{0%,100%{opacity:.55}50%{opacity:1}}
+select option{background:#000;color:#fff}
+svg.i{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+svg.i .fd{fill:currentColor;stroke:none}
+/* nav removed — sub-pages use back button, home uses cards */
+.page{display:none}
+.page.on{display:block;opacity:1;animation:fadeIn .2s ease}
+#p-home.page.on{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.hd{background:#000;padding:14px 16px;display:flex;align-items:center;justify-content:flex-start;gap:10px;border-bottom:1px solid rgba(255,255,255,.07)}
+.hd .badge{margin-left:auto}
+.hd h1{font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px;min-width:0;white-space:nowrap;overflow:hidden}
+.badge{background:rgba(108,203,95,.15);color:#6CCB5F;padding:6px 12px;border-radius:4px;font-size:12px;flex-shrink:0}
+.badge::before{content:'● ';animation:bk 1s infinite}
+.badge.off{background:rgba(233,69,96,.15);color:#ff8a93}
+@keyframes bk{50%{opacity:.3}}
+.stats{display:flex;gap:10px;padding:14px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.st{flex:0 0 auto;min-width:100px;background:rgba(255,255,255,.18);border-radius:8px;padding:14px 16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:transform .15s ease}
+.st .ic{margin-bottom:4px;display:flex;justify-content:center}.st .ic svg{width:22px;height:22px}
+.st .v{font-size:26px;font-weight:600;color:#fff;white-space:nowrap}
+.st .l{font-size:11px;color:rgba(255,255,255,.54);margin-top:2px}
+@keyframes pop{50%{transform:scale(1.18)}}
+.st:nth-child(1){animation:flUp .4s cubic-bezier(0,0,0,1) backwards}
+.st:nth-child(2){animation:flUp .4s cubic-bezier(0,0,0,1) .06s backwards}
+.st:nth-child(3){animation:flUp .4s cubic-bezier(0,0,0,1) .12s backwards}
+.st:nth-child(4){animation:flUp .4s cubic-bezier(0,0,0,1) .18s backwards}
+@keyframes flUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blip{0%{opacity:0;transform:scale(.3)}18%{opacity:1;transform:scale(1)}70%{opacity:.85}100%{opacity:0;transform:scale(1.8)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media(max-width:899px){
+.stats{display:flex;gap:6px;padding:10px 8px 4px;overflow-x:hidden}
+.st{flex:1 1 0;min-width:0;padding:10px 2px}
+.st .ic{margin-bottom:2px}.st .ic svg{width:18px;height:18px}
+.st .v{font-size:18px;line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st .l{font-size:10px;margin-top:1px}
+#p-scan .st.t .v{font-size:13px;line-height:22px}
+#p-scan .item-sub{white-space:normal;line-height:1.45}
+}
+@media(min-width:900px){
+.stats{flex-wrap:wrap;padding:14px 24px;justify-content:center}
+.st{flex:1 1 200px;max-width:240px}
+.hd{padding:14px 24px}
+.hd h1{font-size:20px}
+}
+@media(hover:hover){.st:hover{transform:translateY(-2px)}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+#p-home{padding:32px 20px calc(24px + env(safe-area-inset-bottom));flex-direction:column;align-items:center}
+#p-home .logo{width:84px;height:84px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--layer);box-shadow:var(--shadow);animation:fp 3.2s ease-in-out infinite;position:relative;overflow:hidden}
+@keyframes fp{50%{box-shadow:0 8px 32px rgba(76,194,255,.25)}}
+#p-home .logo svg{width:46px;height:46px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;position:relative;z-index:1}
+#p-home .logo svg path:nth-of-type(1){stroke-dasharray:18;stroke-dashoffset:18;animation:draw1 6s cubic-bezier(.6,0,.3,1) .25s infinite}
+#p-home .logo svg path:nth-of-type(2){stroke-dasharray:66;stroke-dashoffset:66;animation:draw2 6s cubic-bezier(.6,0,.3,1) .25s infinite}
+@keyframes draw1{0%,11.7%{stroke-dashoffset:18}16.7%,78.3%{stroke-dashoffset:0}83.3%,100%{stroke-dashoffset:18}}
+@keyframes draw2{0%,16.7%{stroke-dashoffset:66}30%,65%{stroke-dashoffset:0}78.3%,100%{stroke-dashoffset:66}}
+#p-home .radar{position:absolute;inset:0;pointer-events:none;animation:radarFade 6s ease-in-out .25s infinite}
+@keyframes radarFade{0%,11.7%{opacity:1;transform:scale(1)}15%,95%{opacity:0;transform:scale(.7)}97%{opacity:1;transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+#p-home .radar::before{content:'';position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px;border-radius:50%;border:1px solid rgba(76,194,255,.22);animation:rp 3.2s ease-in-out infinite}
+@keyframes rp{0%,100%{transform:scale(.72);opacity:.35}50%{transform:scale(1);opacity:.9}}
+#p-home .radar::after{content:'';position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px;border-radius:50%;background:conic-gradient(from 0deg,rgba(76,194,255,.32),transparent 65deg);animation:spin 3.2s linear infinite}
+#p-home .radar b{position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:#4CC2FF;box-shadow:0 0 6px rgba(76,194,255,.9);opacity:0;animation:blip 3.2s ease-out infinite}
+#p-home .radar b:nth-child(1){margin-left:-26px;margin-top:-16px}
+#p-home .radar b:nth-child(2){margin-left:18px;margin-top:-26px;animation-delay:1s}
+#p-home .radar b:nth-child(3){margin-left:26px;margin-top:14px;animation-delay:2s}
+#p-home .title{margin-top:20px;font-size:1.9rem;font-weight:600;letter-spacing:4px;color:#fff;animation:flUp .45s cubic-bezier(0,0,0,1) backwards,titleGlow 2.8s ease-in-out .5s infinite}
+@keyframes titleGlow{0%,100%{text-shadow:0 0 0 rgba(76,194,255,0)}50%{text-shadow:0 0 22px rgba(76,194,255,.35)}}
+#p-home .sub{margin-top:8px;font-size:.78rem;color:var(--sub);letter-spacing:2px;text-align:center;line-height:1.6}
+#p-home .sub b{color:#fff;font-weight:600}
+#p-home .cards{width:100%;max-width:420px;margin-top:36px;display:flex;flex-direction:column;gap:14px}
+#p-home .card{display:flex;align-items:center;gap:14px;text-decoration:none;background:var(--layer);border:1px solid #fff;border-radius:8px;padding:18px 16px;box-shadow:var(--shadow);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;cursor:pointer;color:inherit;font-family:inherit;text-align:left;animation:flUp .45s cubic-bezier(0,0,0,1) backwards;width:100%}
+#p-home .card:active{transform:scale(.97)}
+#p-home .card:nth-child(2){animation-delay:.08s}
+#p-home .card .ci{width:52px;height:52px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:transform .3s ease}
+#p-home .card .ci svg{width:28px;height:28px;animation:ciFloat 4s ease-in-out infinite}
+#p-home .card:nth-child(2) .ci svg{animation-delay:1.2s}
+@keyframes ciFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+#p-home .card .t{font-size:1.05rem;font-weight:600;letter-spacing:1px}
+#p-home .card .d{font-size:.74rem;color:var(--sub);margin-top:3px;line-height:1.5}
+#p-home .card .ar{margin-left:auto;color:var(--faint);flex-shrink:0;display:flex;transition:transform .2s cubic-bezier(0,0,0,1)}
+#p-home .card .ar svg{width:20px;height:20px}
+#p-home .card-scan .ci{background:rgba(108,203,95,.15);color:var(--green)}
+#p-home .card-scan .t{color:var(--green)}
+#p-home .card-status .ci{background:rgba(76,194,255,.15);color:var(--accent)}
+#p-home .card-status .t{color:var(--accent)}
+#p-home .hint{width:100%;max-width:420px;margin-top:32px;animation:flUp .45s cubic-bezier(0,0,0,1) .2s backwards}
+#p-home .ht{font-size:.72rem;color:var(--sub);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+#p-home .ht::after{content:'';flex:1;height:1px;background:var(--line)}
+#p-home .rows{display:flex;flex-direction:column;gap:10px}
+#p-home .row{display:flex;gap:10px;align-items:flex-start;background:var(--layer);border-radius:8px;padding:12px 14px;font-size:.8rem;color:var(--sub);line-height:1.6}
+#p-home .row .ri{flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center}
+#p-home .row .ri svg{width:18px;height:18px}
+#p-home .row:nth-child(1) .ri{color:var(--green)}
+#p-home .row:nth-child(2) .ri{color:var(--accent)}
+#p-home .row strong{color:#fff;font-weight:600;margin-right:2px}
+#p-home .foot{margin-top:auto;padding-top:36px;color:var(--faint);font-size:.64rem;letter-spacing:1.5px;text-align:center;line-height:1.8}
+@media(min-width:900px){
+#p-home{padding:48px 32px calc(32px + env(safe-area-inset-bottom))}
+#p-home .logo{width:92px;height:92px}
+#p-home .logo svg{width:50px;height:50px}
+#p-home .title{font-size:2.1rem}
+#p-home .cards{max-width:680px;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:44px}
+#p-home .hint{max-width:680px}
+#p-home .rows{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#p-home .card{padding:20px 18px}
+}
+@media(hover:hover){#p-home .card:hover{transform:translateY(-3px);border-color:rgba(76,194,255,.55);box-shadow:0 8px 24px rgba(0,0,0,.45)}#p-home .card:hover .ar{transform:translateX(4px)}#p-home .card:hover .ci{transform:translateY(-2px) scale(1.07)}}
+#p-scan .ctrls{padding:0 16px 10px;display:flex;gap:8px}
+#p-scan .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#4CC2FF;color:#000;border:none;border-bottom:2px solid rgba(0,0,0,.4);padding:10px 18px;border-radius:4px;cursor:pointer;font-size:13px;font-weight:500;flex-shrink:0;transition:filter .15s ease,transform .12s ease;font-family:inherit}
+#p-scan .btn svg{width:15px;height:15px}
+#p-scan .btn2{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:rgba(255,255,255,.18);color:rgba(255,255,255,.79);transition:background .15s ease}
+#p-scan .btn:active{opacity:.8;transform:scale(.97)}
+#p-scan .btn:hover{filter:brightness(1.1)}
+#p-scan .btn2:hover{background:rgba(255,255,255,.28)}
+#p-scan .list{padding:6px 16px 80px}
+#p-scan .item{background:rgba(255,255,255,.18);border-radius:8px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:border-color .3s,transform .15s ease}
+#p-scan .item-head{padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+#p-scan .item-icon{flex-shrink:0;display:flex}#p-scan .item-icon svg{width:28px;height:28px}
+#p-scan .item-info{flex:1;min-width:0;overflow:hidden}
+#p-scan .item-name{min-width:0;font-size:15px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#p-scan .item-name-row{display:flex;align-items:center;gap:8px;min-width:0}
+#p-scan .item-name.unknown{color:#FCE100}
+#p-scan .item-sub{font-size:11px;color:rgba(255,255,255,.54);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#p-scan .item-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+#p-scan .item-rssi{font-size:11px;color:rgba(255,255,255,.54);white-space:nowrap}
+#p-scan .sbar{width:80px;flex-shrink:0;height:4px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden}
+#p-scan .sfill{display:block;height:100%;border-radius:2px;transition:width .35s ease}
+#p-scan .cat-tag{flex-shrink:0;font-size:10px;padding:2px 8px;border-radius:4px;white-space:nowrap}
+#p-scan .cat-tag.c0{background:rgba(108,203,95,.15);color:#6CCB5F}
+#p-scan .cat-tag.c1{background:rgba(76,194,255,.15);color:#4CC2FF}
+#p-scan .cat-tag.c2{background:rgba(197,138,249,.15);color:#C58AF9}
+#p-scan .cat-tag.c3{background:rgba(252,225,0,.15);color:#FCE100}
+#p-scan .arrow{color:rgba(255,255,255,.36);display:flex;transition:transform .3s;flex-shrink:0}
+#p-scan .arrow svg{width:14px;height:14px}
+#p-scan .item.exp .arrow{transform:rotate(90deg)}
+#p-scan .detail{display:none;border-top:1px solid rgba(255,255,255,.06);padding:12px 14px;background:rgba(0,0,0,.25);overflow:hidden}
+#p-scan .item.exp .detail{display:block;max-height:none}
+#p-scan .dg{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-height:0}
+#p-scan .morebtn{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:4px;margin-top:4px;padding:6px 0;color:rgba(255,255,255,.54);font-size:12px;cursor:pointer;border-top:1px solid rgba(255,255,255,.06);-webkit-tap-highlight-color:transparent;user-select:none}
+#p-scan .morebtn svg{width:13px;height:13px;transition:transform .2s}
+#p-scan .morebtn.on svg{transform:rotate(90deg)}
+#p-scan .more{display:none;grid-column:1/-1;border-top:1px solid rgba(255,255,255,.06);padding-top:8px;overflow:hidden}
+#p-scan .grp{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:10px 0 2px;color:rgba(255,255,255,.38);font-size:10px;letter-spacing:2px;user-select:none}
+#p-scan .grp::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08)}
+#p-scan .di{background:rgba(255,255,255,.04);padding:8px 10px;border-radius:4px;overflow:hidden}
+#p-scan .di .lb{font-size:10px;color:rgba(255,255,255,.54);margin-bottom:2px;display:flex;align-items:center;gap:4px}
+#p-scan .di .lb svg{width:11px;height:11px;flex-shrink:0}
+#p-scan .di a{color:#4CC2FF;text-decoration:none;font-size:12px}#p-scan .di a:active{opacity:.7}
+#p-scan .di .vl{font-size:12px;color:rgba(255,255,255,.79);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#p-scan .di.fw{grid-column:span 2}
+#p-scan .di.hw{grid-column:span 2}
+#p-scan .di.sn .vl{white-space:normal;word-break:break-all;font-size:11px}
+#p-scan .empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,.36)}
+#p-scan .empty .radar{position:relative;width:104px;height:104px;margin:0 auto 18px;border-radius:50%;border:1px solid rgba(76,194,255,.2);background:radial-gradient(circle,rgba(76,194,255,.05),transparent 62%)}
+#p-scan .empty .radar::before{content:'';position:absolute;inset:16px;border-radius:50%;border:1px solid rgba(76,194,255,.16)}
+#p-scan .empty .radar::after{content:'';position:absolute;inset:34px;border-radius:50%;border:1px solid rgba(76,194,255,.12)}
+#p-scan .empty .radar .sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(76,194,255,.3),transparent 65deg);animation:spin 2.6s linear infinite}
+#p-scan .empty .radar b{position:absolute;width:5px;height:5px;margin:-2.5px;border-radius:50%;background:#4CC2FF;box-shadow:0 0 8px rgba(76,194,255,.9);opacity:0;animation:blip 2.6s ease-out infinite}
+#p-scan .empty .radar .b1{left:36%;top:30%;animation-delay:.5s}
+#p-scan .empty .radar .b2{left:62%;top:54%;animation-delay:1.4s}
+#p-scan .empty .radar .b3{left:44%;top:70%;animation-delay:2.1s}
+#p-scan .empty h3{font-size:16px;color:rgba(255,255,255,.54);margin-bottom:8px}
+#p-scan .empty p{font-size:13px;color:rgba(255,255,255,.36)}
+#p-scan .dots{display:inline-flex;gap:3px;margin-left:2px;vertical-align:2px}
+#p-scan .dots i{width:4px;height:4px;border-radius:50%;background:currentColor;animation:dotB 1.2s ease-in-out infinite}
+#p-scan .dots i:nth-child(2){animation-delay:.18s}
+#p-scan .dots i:nth-child(3){animation-delay:.36s}
+@keyframes dotB{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+#p-scan .lu{text-align:center;padding:8px;color:rgba(255,255,255,.36);font-size:11px}
+#p-scan .st.d .ic{color:#FF99A4}#p-scan .st.p .ic{color:#4CC2FF}#p-scan .st.t .ic{color:#6CCB5F}
+#p-scan .st.d .v{color:#FF99A4}#p-scan .st.p .v{color:#4CC2FF}#p-scan .st.t .v{color:#6CCB5F}
+#p-scan .st .v.pop{animation:pop .34s ease}
+#p-scan .item.new{animation:newIn .5s cubic-bezier(.2,.9,.3,1)}
+@keyframes newIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
+#p-scan .item.anim .detail{display:block;max-height:0;border-top-width:0;transition:max-height .45s ease-out}
+#p-scan .item.closing .detail{display:block;max-height:0;border-top-width:0;transition:max-height .45s ease-out}
+#p-scan .more.anim{display:block;max-height:0;transition:max-height .45s ease-out}
+#p-scan .more.closing{display:block;max-height:0;transition:max-height .45s ease-out}
+@media(min-width:900px){
+#p-scan .ctrls{max-width:1200px;margin:0 auto;padding-left:24px;padding-right:24px}
+#p-scan .list{max-width:1200px;margin:0 auto;padding:6px 24px 80px;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+#wrap{max-width:1200px;margin:0 auto}
+#p-scan .item{margin-bottom:0;display:flex;flex-direction:column}
+#p-scan .dg{grid-template-columns:repeat(4,1fr)}
+#p-scan .di.fw{grid-column:span 4}
+#p-scan .di.hw{grid-column:span 2}
+#p-scan .empty .radar{width:112px;height:112px}
+}
+@media(hover:hover){#p-scan .item:hover{transform:translateY(-1px);background:rgba(255,255,255,.24)}}
+#wrap{position:relative}
+#ovl{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.82);border-radius:8px;text-align:center;padding:24px;z-index:5;pointer-events:none}
+#ovl.on{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+#ovl svg{width:42px;height:42px;color:#FF99A4;animation:ovlPulse 1.6s ease-in-out infinite}
+@keyframes ovlPulse{50%{opacity:.5}}
+#ovt1{font-size:17px;font-weight:600;color:#fff}
+#ovt2{font-size:12px;color:rgba(255,255,255,.6);line-height:1.6;max-width:280px}
+#connlost{animation:fadeIn .3s ease-out}
+#fullwarn{animation:fadeIn .3s ease-out}
+#calovl{animation:fadeIn .25s ease-out}
+#calovl>div{animation:calPop .3s cubic-bezier(.2,.9,.3,1)}
+#calovl.closing{animation:calOut .18s ease forwards}
+#calovl.closing>div{animation:calPopOut .18s ease forwards}
+@keyframes calPop{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes calOut{to{opacity:0}}
+@keyframes calPopOut{to{opacity:0;transform:translateY(8px) scale(.97)}}
+#p-status .wrap{max-width:760px;margin:0 auto;padding:0 16px 40px}
+#p-status .sec{margin-top:18px}
+#p-status .st2{font-size:12px;color:rgba(255,255,255,.45);letter-spacing:2px;margin-bottom:10px;display:flex;align-items:center;gap:8px;user-select:none}
+#p-status .st2::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08)}
+#p-status .bars{display:flex;flex-direction:column;gap:14px;background:rgba(255,255,255,.06);border-radius:8px;padding:16px}
+#p-status .bar-row .bt{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;color:rgba(255,255,255,.79)}
+#p-status .bar-row .bt b{color:#fff;font-weight:600}
+#p-status .sbar{height:6px;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden}
+#p-status .sfill{display:block;height:100%;border-radius:3px;transition:width .5s ease}
+#p-status .rows{display:flex;flex-direction:column;gap:8px}
+#p-status .row{display:flex;justify-content:space-between;align-items:center;gap:12px;background:rgba(255,255,255,.06);border-radius:8px;padding:12px 14px;font-size:13px}
+#p-status .row .k{color:rgba(255,255,255,.54);display:flex;align-items:center;gap:8px;min-width:0}
+#p-status .row .k svg{width:15px;height:15px;color:#4CC2FF;flex-shrink:0}
+#p-status .row .v{color:#fff;font-weight:500;text-align:right;white-space:nowrap}
+#p-status .lu{text-align:center;padding:14px;color:rgba(255,255,255,.36);font-size:11px}
+#p-status .st.c .ic{color:#4CC2FF}#p-status .st.m .ic{color:#C58AF9}#p-status .st.p .ic{color:#6CCB5F}#p-status .st.n .ic{color:#FCE100}
+@media(min-width:900px){#p-status .rows{display:grid;grid-template-columns:1fr 1fr;gap:8px}}
+</style>
+</head>
+<body>
+<div id="dsbar"></div>
+
+
+<section id="p-home" class="page">
+<div class="logo">
+<span class="radar"><b></b><b></b><b></b></span>
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4CC2FF"/><stop offset="1" stop-color="#79D4FF"/></linearGradient></defs><path stroke="url(#lgg)" d="M22 2 11 13"/><path stroke="url(#lgg)" d="M11 13 2 9 22 2 15 22Z"/></svg>
+</div>
+<h1 class="title">Remote ID 工具</h1>
+<p class="sub">无人机 <b>Remote ID</b> 信号探测与模拟平台</p>
+
+<div class="cards">
+  <button type="button" class="card card-scan" onclick="go('scan')">
+    <div class="ci"><svg class="i" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 12a8 8 0 0 1 16 0"/><path d="M7 12a5 5 0 0 1 10 0"/><path d="M12 12 17.66 6.34"/><circle class="fd" cx="12" cy="12" r="1.6"/></svg></div>
+    <div><div class="t">侦测</div><div class="d">监听 WiFi 信道，扫描附近的无人机信号</div></div>
+    <div class="ar"><svg class="i" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"/></svg></div>
+  </button>
+  <button type="button" class="card card-status" onclick="go('status')">
+    <div class="ci"><svg class="i" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5L13 2Z"/></svg></div>
+    <div><div class="t">状态</div><div class="d">查看设备 CPU、内存与系统运行状况</div></div>
+    <div class="ar"><svg class="i" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"/></svg></div>
+  </button>
+</div>
+
+<div class="hint">
+  <div class="ht">使用说明</div>
+  <div class="rows">
+    <div class="row"><span class="ri"><svg class="i" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.5s-6.5-5-6.5-10a6.5 6.5 0 0 1 13 0c0 5-6.5 10-6.5 10Z"/><circle cx="12" cy="10.2" r="2.3"/></svg></span><span><strong>连接设备</strong>：手机用 OTG 线插上 ESP32，点击顶部「连接设备」，在列表中选择 <strong>USB JTAG/serial debug unit</strong> 即可（无需连接热点）</span></div>
+    <div class="row"><span class="ri"><svg class="i" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="2.4"/><path d="M10.8 10.8 5 5"/><path d="M13.2 13.2 19 19"/><path d="M13.2 10.8 19 5"/><path d="M10.8 13.2 5 19"/><circle cx="5" cy="5" r="1.7"/><circle cx="19" cy="19" r="1.7"/><circle cx="19" cy="5" r="1.7"/><circle cx="5" cy="19" r="1.7"/></svg></span><span><strong>侦测模式</strong>：捕获附近无人机 OpenDroneID 广播，实时显示坐标、高度、速度与操作者位置</span></div>
+  </div>
+</div>
+
+<div class="foot">ESP32 ALL-IN-ONE · REMOTE ID SCANNER · USB Web Serial<br>仅供学习研究与安全检测使用</div>
+</section>
+
+<section id="p-scan" class="page">
+<div class="hd"><button onclick="go('home')" style="background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer;font-family:inherit;margin-right:8px;flex-shrink:0">&larr; 返回</button><h1>无人机探测</h1><div class="badge" id="bdg">扫描中</div></div>
+<div id="connlost" style="display:none;background:rgba(255,153,164,.12);color:#FF99A4;margin:10px 16px 0;padding:12px 14px;border-radius:4px;text-align:center;font-size:14px;font-weight:600"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg> 未连接 — 请点击顶部「连接设备」；已连接却无数据时，请确认 ESP32 已烧录新固件（串口监视器输入 SYS 应回 JSON 行）</div>
+<div id="fullwarn" style="display:none;background:rgba(252,225,0,.12);color:#FCE100;margin:10px 16px 0;padding:10px 14px;border-radius:4px;font-size:12px;line-height:1.6;text-align:center"><span id="fwmsg"></span><span style="display:flex;gap:8px;justify-content:center;margin-top:6px"><button onclick="prune()" id="fwprune" style="background:rgba(252,225,0,.15);color:#FCE100;border:1px solid #FCE100;border-radius:4px;padding:4px 12px;font-size:12px">删除失联目标</button><button onclick="clr()" style="background:rgba(255,153,164,.15);color:#FF99A4;border:1px solid #FF99A4;border-radius:4px;padding:4px 12px;font-size:12px">清空全部</button></span></div>
+<div id="prevhint" style="display:none;background:rgba(252,225,0,.1);color:#FCE100;margin:10px 16px 0;padding:10px 14px;border-radius:4px;text-align:center;font-size:12px;line-height:1.5"></div>
+<div class="stats">
+  <div class="st d"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8 7.2 5M12 14.2l-4.8 4.8M12 14.2l4.8 4.8M12 9.8l4.8-4.8"/><circle cx="5.5" cy="5.5" r="1.6"/><circle cx="18.5" cy="5.5" r="1.6"/><circle cx="5.5" cy="18.5" r="1.6"/><circle cx="18.5" cy="18.5" r="1.6"/></svg></div><div class="v" id="dc">0</div><div class="l">无人机</div></div>
+  <div class="st p"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 4.9a10 10 0 0 0 0 14.2"/><path d="M19.1 4.9a10 10 0 0 1 0 14.2"/><path d="M8.5 8.5a5 5 0 0 0 0 7"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><circle cx="12" cy="12" r="1.5"/></svg></div><div class="v" id="pc">0</div><div class="l">数据包</div></div>
+  <div class="st t"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></div><div class="v" id="at">--</div><div class="l">运行时长</div></div>
+  <div class="st p"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20v-8M12 20V4M18 20v-6"/></svg></div><div class="v" id="pr">0</div><div class="l">包/秒</div></div>
+</div>
+<div class="ctrls">
+  <button class="btn" onclick="load()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v4h-4"/></svg>刷新</button>
+  <select id="refr" onchange="startPoll()" style="background:rgba(255,255,255,.18);color:rgba(255,255,255,.79);border-radius:4px;padding:8px 10px;font-size:13px;outline:none;flex-shrink:0">
+    <option value="100">刷新 0.1s</option>
+    <option value="200">刷新 0.2s</option>
+    <option value="500">刷新 0.5s</option>
+    <option value="1000" selected>刷新 1s</option>
+    <option value="2000">刷新 2s</option>
+    <option value="5000">刷新 5s</option>
+    <option value="10000">刷新 10s</option>
+  </select>
+  <button class="btn btn2" onclick="clr()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>清空</button>
+</div>
+<div id="wrap"><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
+<div class="lu" id="lu">--</div>
+</section>
+
+<section id="p-status" class="page">
+<div class="hd"><button onclick="go('home')" style="background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer;font-family:inherit;margin-right:8px;flex-shrink:0">&larr; 返回</button><h1>系统状态</h1></div>
+<div class="stats">
+  <div class="st c"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5L13 2Z"/></svg></div><div class="v" id="cCpu">--</div><div class="l">CPU 占用</div></div>
+  <div class="st m"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5h8v2"/></svg></div><div class="v" id="cHeap">--</div><div class="l">可用内存</div></div>
+  <div class="st p"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 4.9a10 10 0 0 0 0 14.2"/><path d="M19.1 4.9a10 10 0 0 1 0 14.2"/><path d="M8.5 8.5a5 5 0 0 0 0 7"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><circle cx="12" cy="12" r="1.5"/></svg></div><div class="v" id="cPps">--</div><div class="l">包/秒</div></div>
+  <div class="st n"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 9l10 6 10-6-10-6Z"/><path d="m2 13 10 6 10-6"/></svg></div><div class="v" id="cCh">--</div><div class="l">监听信道</div></div>
+</div>
+<div class="wrap">
+  <div class="sec">
+    <div class="st2">占用率</div>
+    <div class="bars">
+      <div class="bar-row"><div class="bt"><span>CPU 占用</span><b id="bCpu">--</b></div><div class="sbar"><span class="sfill" id="bCpuF" style="width:0%"></span></div></div>
+      <div class="bar-row"><div class="bt"><span>内存占用</span><b id="bHeap">--</b></div><div class="sbar"><span class="sfill" id="bHeapF" style="width:0%"></span></div></div>
+      <div class="bar-row"><div class="bt"><span>Flash 占用</span><b id="bFlash">--</b></div><div class="sbar"><span class="sfill" id="bFlashF" style="width:0%"></span></div></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="st2">系统信息</div>
+    <div class="rows">
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>运行时长</span><span class="v" id="rUp">--</span></div>
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8 7.2 5M12 14.2l-4.8 4.8M12 14.2l4.8 4.8M12 9.8l4.8-4.8"/><circle cx="5.5" cy="5.5" r="1.6"/><circle cx="18.5" cy="5.5" r="1.6"/><circle cx="5.5" cy="18.5" r="1.6"/><circle cx="18.5" cy="18.5" r="1.6"/></svg>CPU 频率</span><span class="v" id="rMhz">--</span></div>
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5h8v2"/></svg>内存总量</span><span class="v" id="rHeapT">--</span></div>
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>最小可用内存（峰值）</span><span class="v" id="rHeapMin">--</span></div>
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20v-8M12 20V4M18 20v-6"/></svg>最大连续可用块</span><span class="v" id="rHeapLg">--</span></div>
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v12H4z"/><path d="M8 9h8M8 12h5"/></svg>Flash 固件占用</span><span class="v" id="rFlash">--</span></div>
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4 4 0 1 0 4 0Z"/><path d="M12 8v7"/></svg>芯片温度</span><span class="v" id="rTemp">--</span></div>
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="18" rx="2"/><path d="M10 4V2h4v2"/></svg>估算功耗</span><span class="v" id="rPwr">--</span></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="st2">扫描统计</div>
+    <div class="rows">
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8 7.2 5M12 14.2l-4.8 4.8M12 14.2l4.8 4.8M12 9.8l4.8-4.8"/><circle cx="5.5" cy="5.5" r="1.6"/><circle cx="18.5" cy="5.5" r="1.6"/><circle cx="5.5" cy="18.5" r="1.6"/><circle cx="18.5" cy="18.5" r="1.6"/></svg>目标无人机</span><span class="v" id="rDrn">--</span></div>
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 4.9a10 10 0 0 0 0 14.2"/><path d="M19.1 4.9a10 10 0 0 1 0 14.2"/><path d="M8.5 8.5a5 5 0 0 0 0 7"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><circle cx="12" cy="12" r="1.5"/></svg>累计数据包</span><span class="v" id="rPkt">--</span></div>
+      <div class="row"><span class="k">管理帧（Beacon）</span><span class="v" id="rMgmt">--</span></div>
+      <div class="row"><span class="k">动作帧（Action）</span><span class="v" id="rAct">--</span></div>
+      <div class="row"><span class="k">NAN 数据帧</span><span class="v" id="rNan">--</span></div>
+      <div class="row"><span class="k">RID IE 帧</span><span class="v" id="rRid">--</span></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="st2">无线电信息</div>
+    <div class="rows">
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/></svg>监听信道</span><span class="v" id="nCh">--</span></div>
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><path d="M8 9a5 5 0 0 0 0 6"/><path d="M16 9a5 5 0 0 1 0 6"/></svg>信道带宽</span><span class="v" id="nBw">--</span></div>
+      <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>发射功率</span><span class="v" id="nTx">--</span></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="st2">RGB 灯效</div>
+    <div class="bars" style="gap:12px">
+      <div class="bar-row"><div class="bt"><span>模式</span><b id="ledModeV">状态联动</b></div>
+        <select id="ledMode" style="width:100%;padding:9px 10px;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:4px;font-size:13px;outline:none">
+          <option value="0">状态联动（侦测绿）</option>
+          <option value="1">单色固定</option>
+          <option value="2">彩色轮换（彩虹）</option>
+          <option value="3">关闭</option>
+        </select></div>
+      <div class="bar-row" id="ledColorRow" style="display:none"><div class="bt"><span>颜色</span><b id="ledHex">#00FF00</b></div>
+        <input type="color" id="ledColor" value="#00ff00" style="width:100%;height:34px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);border-radius:4px;cursor:pointer"></div>
+      <div class="bar-row"><div class="bt"><span>亮度</span><b id="ledBrightV">100%</b></div>
+        <input type="range" id="ledBright" min="0" max="100" step="1" value="100" style="width:100%;accent-color:#4CC2FF"></div>
+      <div class="bar-row" id="ledSpeedRow" style="display:none"><div class="bt"><span>轮换速度</span><b id="ledSpeedV">50</b></div>
+        <input type="range" id="ledSpeed" min="0" max="100" step="1" value="50" style="width:100%;accent-color:#4CC2FF">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.5">越大彩虹转得越快。已按平滑步进处理，不会跳色。</div></div>
+      <div class="bar-row"><div class="bt"><span>开机灯效</span><b id="ledBootV">快速显示保存灯效</b></div>
+        <select id="ledBoot" style="width:100%;padding:9px 10px;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:4px;font-size:13px;outline:none">
+          <option value="1">快速：开机白闪一下，立刻显示保存灯效</option>
+          <option value="2">直接显示：开机完全不闪，直接亮保存的灯效</option>
+          <option value="0">自检：开机先轮播颜色自检，再显示保存灯效</option>
+        </select>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.5">「自检」会多等约 4 秒（11 色 × 0.35s）；「快速」闪一下白；「直接显示」不闪。</div></div>
+      <div class="bar-row" style="flex-direction:column;align-items:stretch">
+        <button id="ledPreview" style="padding:9px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:4px;font-size:12px;cursor:pointer;font-family:inherit">预览灯效（发送到设备）</button>
+        <button id="ledSave" style="padding:9px;margin-top:8px;background:#4CC2FF;color:#000;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">保存到设备（重启不丢）</button>
+        <div id="ledInfo" style="font-size:11px;color:rgba(255,255,255,.5);margin-top:8px;line-height:1.5">「保存到设备」会写入 ESP32 的 NVS 存储（含开机灯效选项），重启后仍生效。</div>
+      </div>
+    </div>
+  </div>
+  <div class="lu" id="slu">--</div>
+</div>
+</section>
+
+
+<script src="serial.js?v24108"></script>
+<script>
+/* ================= 全局：页面导航 + 串口栏 ================= */
+var cur = null;
+function go(name) {
+  if (cur === name) return;
+  if (cur === 'scan' && typeof scanStop === 'function') scanStop();
+  if (cur === 'status' && typeof statusStop === 'function') statusStop();
+  cur = name;
+  var ps = document.querySelectorAll('.page');
+  for (var i = 0; i < ps.length; i++) ps[i].classList.remove('on');
+  var el = document.getElementById('p-' + name);
+  if (el) el.classList.add('on');
+  window.scrollTo(0, 0);
+  if (name === 'scan' && typeof scanStart === 'function') scanStart();
+  if (name === 'status' && typeof statusStart === 'function') statusStart();
+  try { history.replaceState(null, '', '#' + name); } catch (e) {}
+}
+window.addEventListener('pageshow', function (e) { if (e.persisted) location.reload(); });
+DS.mountBar('dsbar');
+document.addEventListener('DOMContentLoaded', function () {
+  if (!DS.supported()) {
+    var ph = document.getElementById('prevhint');
+    if (ph) { ph.style.display = 'block'; ph.textContent = '此浏览器不支持 Web Serial / Web Bluetooth（需 Chrome；Android 需较新版本；页面需 HTTPS）'; }
+  }
+  var init = (location.hash || '').replace('#', '');
+  if (['home', 'scan', 'status'].indexOf(init) < 0) init = 'home';
+  go(init);
+});
+</script>
+<script>
+/* ================= 侦测页 ================= */
+(function () {
+var st=Date.now();
+var PREV=false;   // Web Serial 版：无本地预览模式
+var lastPop={};
+function setNum(id,v){var e=document.getElementById(id);if(!e)return;var t=String(v);if(e.textContent===t)return;e.textContent=t;var now=Date.now();if(lastPop[id]&&now-lastPop[id]<600)return;lastPop[id]=now;e.classList.remove('pop');e.offsetWidth;e.classList.add('pop');setTimeout(function(){if(e.classList)e.classList.remove('pop')},380);}
+var STMAP={0:'未声明',1:'地面',2:'空中',3:'紧急',4:'系统故障'};
+var UAMAP={0:'未声明',1:'固定翼',2:'多旋翼',3:'自转旋翼',4:'复合翼',5:'扑翼机',6:'滑翔机',7:'风筝',8:'自由气球',9:'系留气球',10:'飞艇',11:'降落伞',12:'火箭',13:'系留动力机',14:'地面障碍',15:'其他'};
+var HORACC={0:'未知',1:'18.5km',2:'7.4km',3:'3.7km',4:'1.85km',5:'926m',6:'556m',7:'185m',8:'93m',9:'30m',10:'10m',11:'3m',12:'1m'};
+var VERACC={0:'未知',1:'150m',2:'45m',3:'25m',4:'10m',5:'3m',6:'1m'};
+var SPDACC={0:'未知',1:'10m/s',2:'3m/s',3:'1m/s',4:'0.3m/s'};
+var OPLOC={0:'起飞点',1:'实时GNSS',2:'固定点'};
+var IDTYPEMAP={0:'无',1:'序列号',2:'CAA 注册号',3:'UTM UUID',4:'会话ID'};
+var OIDTYPEMAP={0:'无',1:'CAA 注册号',2:'UTM UUID',3:'特定会话ID'};
+var DESCTYPEMAP={0:'文本',1:'紧急状态',2:'扩展状态'};
+var AUTHTYPEMAP={1:'UAS 签名',2:'操作员签名',3:'消息集签名',4:'网络 RID',5:'特定认证'};
+var EUCATMAP={0:'未声明',1:'开放类',2:'特定类',3:'认证类'};
+var EUCLASSMAP={0:'未声明',1:'C0',2:'C1',3:'C2',4:'C3',5:'C4',6:'C5',7:'C6'};
+function ft(s){var h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=Math.floor(s%60);return(h>0?h+'h ':'')+(m>0?m+'m ':'')+sc+'s'}
+function fmtAgo(s){s=Math.floor(s);if(s<60)return s+'秒前';var m=Math.floor(s/60),sec=s%60;if(m<60)return m+'分'+(sec>0?sec+'秒':'')+'前';var h=Math.floor(m/60);return h+'小时'+(m%60)+'分前';}
+function fmtDur(s){s=Math.floor(s);var h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;return(h>0?h+'小时':'')+(m>0?m+'分':'')+sc+'秒';}
+var IS_IOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+function wgs2gcj(lat,lon){var a=6378245.0,ee=0.00669342162296594323;if(lon<72.004||lon>137.8347||lat<0.8293||lat>55.8271)return [lat,lon];
+function tLat(x,y){var r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*Math.PI)+20*Math.sin(2*x*Math.PI))*2/3;r+=(20*Math.sin(y*Math.PI)+40*Math.sin(y/3*Math.PI))*2/3;r+=(160*Math.sin(y/12*Math.PI)+320*Math.sin(y*Math.PI/30))*2/3;return r;}
+function tLon(x,y){var r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*Math.PI)+20*Math.sin(2*x*Math.PI))*2/3;r+=(20*Math.sin(x*Math.PI)+40*Math.sin(x/3*Math.PI))*2/3;r+=(150*Math.sin(x/12*Math.PI)+300*Math.sin(x/30*Math.PI))*2/3;return r;}
+var dLat=tLat(lon-105,lat-35),dLon=tLon(lon-105,lat-35);var rad=lat/180*Math.PI,magic=Math.sin(rad);magic=1-ee*magic*magic;var sm=Math.sqrt(magic);
+dLat=(dLat*180)/((a*(1-ee))/(magic*sm)*Math.PI);dLon=(dLon*180)/(a/sm*Math.cos(rad)*Math.PI);
+return [lat+dLat,lon+dLon];}
+function amapUrl(n,lat,lon){var g=wgs2gcj(lat,lon);return (IS_IOS?'iosamap':'androidamap')+'://viewMap?sourceApplication=DroneScanner&poiname='+encodeURIComponent(n)+'&lat='+g[0].toFixed(6)+'&lon='+g[1].toFixed(6)+'&dev=0';}
+function webMapUrl(n,lat,lon){var g=wgs2gcj(lat,lon);return 'https://uri.amap.com/marker?position='+g[1].toFixed(6)+','+g[0].toFixed(6)+'&name='+encodeURIComponent(n);}
+function rc(r){if(r>-70)return'#6CCB5F';if(r>-55)return'#A3C24D';if(r>-40)return'#FCE100';return'#FF99A4'}
+  function cc(c){if(!c)return'c3';if(c.indexOf('consumer')>=0)return'c0';if(c.indexOf('fpv')>=0)return'c1';if(c.indexOf('enterprise')>=0)return'c2';return'c3'}
+function endAnim(a,c,cls,fb,ex){var done=0;function fin(){if(done)return;done=1;a.style.maxHeight='';for(var k=0;k<cls.length;k++)c.classList.remove(cls[k]);if(ex)ex();}function onEnd(ev){if(ev.target===a&&ev.propertyName==='max-height'){a.removeEventListener('transitionend',onEnd);fin();}}a.addEventListener('transitionend',onEnd);setTimeout(fin,fb);}
+function tog(id){var e=document.getElementById(id);if(!e)return;var d=e.querySelector('.detail');if(!d)return;selPause=Date.now()+900;if(e.classList.contains('exp')){d.style.maxHeight=d.scrollHeight+'px';void d.offsetWidth;e.classList.add('closing');d.style.maxHeight='0px';endAnim(d,e,['exp','closing'],1500)}else{e.classList.add('anim');e.classList.add('exp');void d.offsetWidth;d.style.maxHeight=d.scrollHeight+'px';endAnim(d,e,['anim'],1500)}}
+function togMore(id){var e=document.getElementById(id);if(!e)return;var b=e.previousElementSibling;var on=e.style.display==='block'||e.style.display==='grid';selPause=Date.now()+900;if(!on){e.style.display='block';e.classList.add('anim');void e.offsetWidth;e.style.maxHeight=e.scrollHeight+'px';endAnim(e,e,['anim'],1500)}else{e.style.maxHeight=e.scrollHeight+'px';void e.offsetWidth;e.classList.add('closing');e.style.maxHeight='0px';endAnim(e,e,['closing'],1500,function(){e.style.display='none'})}if(b)b.classList.toggle('on',!on)}
+function load(){
+var expanded={};
+var els=document.querySelectorAll('.item.exp');
+for(var i=0;i<els.length;i++)expanded[els[i].id]=1;
+var moreOpen={};
+var mels=document.querySelectorAll('.more');
+for(var k=0;k<mels.length;k++){if(mels[k].style.display==='block'||mels[k].style.display==='grid')moreOpen[mels[k].id]=1;}
+if(!DS.isConnected()){if(offTimer)clearTimeout(offTimer);showOff();return;}
+DS.cmd('DRONES',4000).then(function(data){
+  if(offTimer){clearTimeout(offTimer);offTimer=null;}
+  if(Date.now()<selPause)return;   // 用户正在触摸/选择文本时暂停重绘，防止长按复制被打断
+  okN++;
+  if(okN>=2)hideOff();   // 连续 2 次成功才恢复，防止瞬间重连闪烁
+  setNum('dc',data.drones?data.drones.length:0);
+  setNum('pc',data.packets||0);
+  document.getElementById('at').textContent=ft((Date.now()-st)/1000);
+  setNum('pr',data.pps||0);
+  var prevMacs=lastData?lastData.map(function(x){return x.mac}):null;
+  var ds=data.drones||[],h='';lastData=ds;
+  var fw=document.getElementById('fullwarn');
+  if(fw){
+    var used=ds.length,sl=data.slots||50;
+    if(used>=Math.ceil(sl*0.8)){
+      fw.style.display='block';
+      var staleN=data.stale||0;
+      var msg='列表槽位已使用 '+used+'/'+sl+(staleN>0?'，其中 '+staleN+' 个已失联':'');
+      document.getElementById('fwmsg').textContent=msg;
+      var bp=document.getElementById('fwprune');
+      if(bp)bp.style.display=(staleN>0)?'inline-block':'none';
+    }else{fw.style.display='none';}
+  }
+  if(!ds.length){
+    var dl0=document.getElementById('dl');
+    if(!dl0.querySelector('.empty')){
+    dl0.innerHTML='<div class="empty"><div class="radar"><div class="sweep"></div><b class="b1"></b><b class="b2"></b><b class="b3"></b></div><h3>暂无探测记录</h3><p>正在扫描周围的无人机信号<span class="dots"><i></i><i></i><i></i></span></p></div>';
+    }
+  }else{
+    for(var i=0;i<ds.length;i++){
+      var d=ds[i],id='d'+i;
+      var mn=d.model_name||'未知机型';
+      var mc=d.model_cat||'';
+      var uk=!d.model_name;
+      var exp=expanded[id]?' exp':'';
+      var isNew=prevMacs&&prevMacs.indexOf(d.mac)<0;
+      var rc2=rc(d.rssi);
+      var icon=uk?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 8.5a2.5 2.5 0 0 1 5 0c0 1.7-2.5 2.3-2.5 4"/><path d="M12 16.5v.5"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8 7.2 5M12 14.2l-4.8 4.8M12 14.2l4.8 4.8M12 9.8l4.8-4.8"/><circle cx="5.5" cy="5.5" r="1.6"/><circle cx="18.5" cy="5.5" r="1.6"/><circle cx="5.5" cy="18.5" r="1.6"/><circle cx="18.5" cy="18.5" r="1.6"/></svg>';
+      var dm=!!d.lat;
+      var pm=!!d.base_lat;
+      h+='<div class="item'+exp+(isNew?' new':'')+'" id="'+id+'">';
+      h+='<div class="item-head" onclick="tog(\''+id+'\')">';
+      h+='<div class="item-icon">'+icon+'</div>';
+      h+='<div class="item-info">';
+      h+='<div class="item-name-row"><div class="item-name'+(uk?' unknown':'')+'">'+mn+'</div>'+(mc?'<span class="cat-tag '+cc(mc)+'">'+mc+'</span>':'')+'</div>';
+      var altV=(d.height_agl!==undefined&&d.height_agl>-999)?d.height_agl:((d.alt!==undefined&&d.alt>-999)?d.alt:null);   // 优先相对高度
+      var sub='活跃'+fmtAgo(d.last_seen);
+      if(altV!==null)sub+=' 高度'+altV+'m';
+      if(d.speed!==undefined&&d.speed!==null)sub+=' 速度'+d.speed+'m/s';
+      h+='<div class="item-sub">'+sub+'</div>';
+      h+='</div>';
+      h+='<div class="item-right">';
+      var noSig=(d.rssi===undefined||d.rssi===null||d.rssi===0);
+      var lost=d.last_seen>5;
+      var dist=!noSig?rssiDist(d.rssi):0;
+      var trs=(d.trend>4)?' <span style="color:#6CCB5F">↑接近</span>':(d.trend<-4)?' <span style="color:#FF99A4">↓远离</span>':'';
+      h+='<div class="item-rssi">'+(noSig?'无信号':(lost?'失联前 '+d.rssi+'dBm':d.rssi+'dBm'))+(dist?' 约'+dist+'m':'')+trs+'</div>';
+      h+='<div class="sbar"><span class="sfill" style="width:'+(noSig?0:Math.round(Math.min(100,Math.max(0,-d.rssi/90*100))))+'%;background:'+(noSig?'#555':rc2)+'"></span></div>';
+      if(d.lat)h+='<div style="display:flex;gap:4px;margin-top:3px"><a href="'+amapUrl('无人机位置',d.lat,d.lon)+'" onclick="event.stopPropagation()" style="color:#4CC2FF;font-size:11px;text-decoration:none;background:rgba(76,194,255,.12);padding:3px 7px;border-radius:4px">🛸 地图</a></div>';
+      h+='</div>';
+      h+='<div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></div>';
+      h+='</div>';
+      h+='<div class="detail"><div class="dg">';
+      h+='<div class="di"><div class="lb">MAC 地址</div><div class="vl">'+d.mac+'</div></div>';
+      if(d.uav_id)h+='<div class="di sn"><div class="lb">序列号</div><div class="vl">'+d.uav_id+'</div></div>';
+      if(d.uav_id2)h+='<div class="di sn"><div class="lb">'+(IDTYPEMAP[d.id_type2]||'附加标识')+'</div><div class="vl">'+d.uav_id2+'</div></div>';
+      if(d.op_id)h+='<div class="di"><div class="lb">操作员</div><div class="vl">'+d.op_id+'</div></div>';
+      else if(d.sys_op_id)h+='<div class="di"><div class="lb">操作员（系统）</div><div class="vl">'+(OIDTYPEMAP[d.sys_op_id_type]?OIDTYPEMAP[d.sys_op_id_type]+' · ':'')+d.sys_op_id+'</div></div>';
+      if(dm)h+='<div class="di fw"><div class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8 7.2 5M12 14.2l-4.8 4.8M12 14.2l4.8 4.8M12 9.8l4.8-4.8"/><circle cx="5.5" cy="5.5" r="1.6"/><circle cx="18.5" cy="5.5" r="1.6"/><circle cx="5.5" cy="18.5" r="1.6"/><circle cx="18.5" cy="18.5" r="1.6"/></svg>无人机位置</div><div class="vl">'+d.lat.toFixed(6)+', '+d.lon.toFixed(6)+' <a href="'+amapUrl('无人机位置',d.lat,d.lon)+'">📍 地图App</a> · <a href="'+webMapUrl('无人机位置',d.lat,d.lon)+'" target="_blank">网页版</a></div></div>';
+      if(pm)h+='<div class="di fw"><div class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-6.5-5-6.5-10a6.5 6.5 0 0 1 13 0c0 5-6.5 10-6.5 10Z"/><circle cx="12" cy="10.2" r="2.3"/></svg>飞手位置</div><div class="vl">'+d.base_lat.toFixed(6)+', '+d.base_lon.toFixed(6)+' <a href="'+amapUrl('飞手位置',d.base_lat,d.base_lon)+'">📍 地图App</a> · <a href="'+webMapUrl('飞手位置',d.base_lat,d.base_lon)+'" target="_blank">网页版</a></div></div>';
+      if(!dm)h+='<div class="di fw"><div class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8 7.2 5M12 14.2l-4.8 4.8M12 14.2l4.8 4.8M12 9.8l4.8-4.8"/><circle cx="5.5" cy="5.5" r="1.6"/><circle cx="18.5" cy="5.5" r="1.6"/><circle cx="5.5" cy="18.5" r="1.6"/><circle cx="18.5" cy="18.5" r="1.6"/></svg>无人机位置</div><div class="vl" style="color:rgba(255,255,255,.45)">未获取定位 — 无人机暂无 GNSS 信号（地面/室内停放时不广播坐标），室外起飞后自动出现</div></div>';
+      if(!pm)h+='<div class="di fw"><div class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-6.5-5-6.5-10a6.5 6.5 0 0 1 13 0c0 5-6.5 10-6.5 10Z"/><circle cx="12" cy="10.2" r="2.3"/></svg>飞手位置</div><div class="vl" style="color:rgba(255,255,255,.45)">未广播飞手位置</div></div>';
+      if(d.height_agl!==undefined&&d.height_agl>-999)h+='<div class="di"><div class="lb">相对高度</div><div class="vl">'+d.height_agl+' m'+(d.height_type===1?'（相对地面）':(d.height_type===0?'（相对起飞点）':''))+'</div></div>';
+      if(d.alt!==undefined&&d.alt>-999)h+='<div class="di"><div class="lb">绝对高度（海平面）</div><div class="vl">'+d.alt+' m</div></div>';
+      var spd='';
+      if(d.speed!==undefined)spd+='水平 '+d.speed+' m/s';
+      if(d.speed_vertical!==undefined)spd+=(spd?' · ':'')+'垂直 '+d.speed_vertical+' m/s';
+      if(spd)h+='<div class="di hw"><div class="lb">速度</div><div class="vl">'+spd+'</div></div>';
+      if(d.heading!==undefined&&d.heading!==null&&d.heading>=0&&d.heading<=360)h+='<div class="di"><div class="lb">航向</div><div class="vl">'+d.heading+'°</div></div>';else h+='<div class="di"><div class="lb">航向</div><div class="vl" style="color:rgba(255,255,255,.45)">未广播（无人机未发送方向）</div></div>';   // 361=无效航向→灰色占位
+      if(d.desc&&d.desc.length>0)h+='<div class="di fw"><div class="lb">描述</div><div class="vl">'+d.desc+'</div></div>';
+      if(d.status!==undefined&&d.status!==null)h+='<div class="di"><div class="lb">飞行状态</div><div class="vl">'+(STMAP[d.status]||d.status)+'</div></div>';
+      if(d.first_seen!==undefined)h+='<div class="di"><div class="lb">首次发现</div><div class="vl">'+fmtAgo(d.first_seen)+'</div></div>';
+      if(d.sys_ts&&d.sys_ts>1000000000){var lt=Math.round(Date.now()/1000-d.sys_ts);h+='<div class="di"><div class="lb">消息延迟</div><div class="vl">'+(lt>=0?(lt+' 秒'):'时间超前')+'</div></div>';}
+      if(d.loc_ts!==undefined&&d.loc_ts!==null&&d.loc_ts>=0&&d.loc_ts<3600){var s=d.loc_ts,hh2=Math.floor(s/3600),mm2=Math.floor((s%3600)/60),ss2=s%60;h+='<div class="di"><div class="lb">定位时间</div><div class="vl">整点后 '+(hh2<10?'0':'')+hh2+':'+(mm2<10?'0':'')+mm2+':'+(ss2<10?'0':'')+ss2+'</div></div>';}
+      if(d.auth_type&&AUTHTYPEMAP[d.auth_type])h+='<div class="di"><div class="lb">认证</div><div class="vl">'+AUTHTYPEMAP[d.auth_type]+(d.auth_len?' · '+d.auth_len+'字节':'')+(d.auth_pages>1?' · 共'+d.auth_pages+'页':'')+(d.auth_timestamp?' · '+new Date(d.auth_timestamp*1000).toLocaleString('zh-CN'):'')+'</div></div>';
+      h+='<div class="di"><div class="lb">最后活跃</div><div class="vl">'+fmtAgo(d.last_seen)+'</div></div>';
+      h+='<div class="morebtn'+(moreOpen['more'+i]?' on':'')+'" onclick="togMore(\'more'+i+'\')"><span>更多信息</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></div>';
+      h+='<div class="more" id="more'+i+'"'+(moreOpen['more'+i]?' style="display:block"':'')+'><div class="dg">';
+      var g1='',g2='',g3='',g4='',g5='';
+      if(d.uatype!==undefined&&d.uatype!==null)g1+='<div class="di"><div class="lb">机型类别</div><div class="vl">'+(UAMAP[d.uatype]||d.uatype)+'</div></div>';
+      if(d.id_type!==undefined&&d.id_type!==null)g1+='<div class="di"><div class="lb">标识类型</div><div class="vl">'+(IDTYPEMAP[d.id_type]||d.id_type)+'</div></div>';
+      if(d.op_id_type!==undefined&&d.op_id_type!==null)g1+='<div class="di"><div class="lb">OID 类型</div><div class="vl">'+(OIDTYPEMAP[d.op_id_type]||d.op_id_type)+'</div></div>';
+      if(d.desc_type!==undefined&&d.desc_type!==null)g1+='<div class="di"><div class="lb">描述类型</div><div class="vl">'+(DESCTYPEMAP[d.desc_type]||d.desc_type)+'</div></div>';
+      if(d.hor_acc!==undefined&&d.hor_acc!==null)g2+='<div class="di fw"><div class="lb">定位精度</div><div class="vl">水平 '+(HORACC[d.hor_acc]||d.hor_acc)+' · 垂直 '+(VERACC[d.ver_acc]||d.ver_acc)+' · 速度 '+(SPDACC[d.speed_acc]||d.speed_acc)+(d.baro_acc!==undefined&&d.baro_acc!==null?' · 气压 '+(VERACC[d.baro_acc]||d.baro_acc):'')+(d.ts_acc!==undefined&&d.ts_acc!==null?' · 时间 '+(d.ts_acc?(d.ts_acc/10)+'s':'未知'):'')+'</div></div>';
+      if(d.op_loc_type!==undefined&&d.op_loc_type!==null)g2+='<div class="di"><div class="lb">飞手位置</div><div class="vl">'+(OPLOC[d.op_loc_type]||d.op_loc_type)+'</div></div>';
+      if(d.alt_baro!==undefined&&d.alt_baro>-999)g2+='<div class="di"><div class="lb">气压高度</div><div class="vl">'+d.alt_baro+' m</div></div>';
+      if(d.op_alt_geo!==undefined&&d.op_alt_geo>-999)g2+='<div class="di"><div class="lb">操作员海拔</div><div class="vl">'+d.op_alt_geo+' m</div></div>';
+      var euc=(d.category_eu>0&&EUCATMAP[d.category_eu])?EUCATMAP[d.category_eu]:'';
+      var eu=(d.class_eu>0&&EUCLASSMAP[d.class_eu])?EUCLASSMAP[d.class_eu]:'';
+      if(d.classification===1||eu||euc)g3+='<div class="di hw"><div class="lb">EU 分类</div><div class="vl">'+(euc?euc+' / ':'')+eu+'</div></div>';
+      if(d.auth_hex||d.auth_data)g3+='<div class="di fw"><div class="lb">认证数据</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+(d.auth_hex||d.auth_data)+'</div></div>';
+      if(d.area_count>0)g3+='<div class="di fw"><div class="lb">应急区域</div><div class="vl">'+d.area_count+' 个 · 半径 '+d.area_radius+'m · 上限 '+d.area_ceiling+'m · 下限 '+d.area_floor+'m</div></div>';
+      if(d.up_s!==undefined&&d.up_s>0)g4+='<div class="di"><div class="lb">开机时长</div><div class="vl">'+fmtDur(d.up_s)+'</div></div>';
+      if(d.pkts!==undefined)g4+='<div class="di"><div class="lb">数据包</div><div class="vl">'+d.pkts+'</div></div>';
+      if(d.bcast!==undefined&&d.bcast>0)g4+='<div class="di"><div class="lb">广播速率</div><div class="vl">'+d.bcast+' 帧/s</div></div>';
+      if(d.hist&&d.hist.length)g5+='<div class="di fw"><div class="lb">飞行轨迹 ('+d.hist.length+'点)</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+d.hist.map(function(p){return p.la.toFixed(6)+','+p.lo.toFixed(6)}).join(' ; ')+'</div></div>';
+      if(d.dji&&d.dji.length)for(var di=0;di<d.dji.length;di++)g5+='<div class="di fw"><div class="lb">DJI 私有消息 0x'+d.dji[di].t.toString(16).toUpperCase()+'</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+d.dji[di].h+'</div></div>';
+      if(d.nan_raw)g5+='<div class="di fw"><div class="lb">NAN 原始帧</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+d.nan_raw+'</div></div>';
+      if(g1)h+='<div class="grp">身份标识</div>'+g1;
+      if(g2)h+='<div class="grp">位置与精度</div>'+g2;
+      if(g3)h+='<div class="grp">系统与合规</div>'+g3;
+      if(g4)h+='<div class="grp">运行统计</div>'+g4;
+      if(g5)h+='<div class="grp">原始数据</div>'+g5;
+      h+='</div></div></div></div></div>';
+    }
+    document.getElementById('dl').innerHTML=h;
+  }
+  document.getElementById('lu').textContent='更新: '+new Date().toLocaleTimeString('zh-CN');
+}).catch(function(){
+  if(Date.now()<selPause)return;
+  showOff();   // 失败立即反馈，不等 3 秒
+});
+if(offTimer)clearTimeout(offTimer);
+offTimer=setTimeout(function(){showOff();},3000);
+}
+var offTimer=null;
+var okN=0;
+function showOff(){
+okN=0;
+var b=document.getElementById('connlost');if(b)b.style.display='block';
+var bg=document.getElementById('bdg');
+if(bg){bg.textContent='未连接';bg.style.background='rgba(233,69,96,.15)';bg.style.color='#ff8a93';bg.style.borderColor='rgba(233,69,96,.4)';}
+var o=document.getElementById('ovl');if(o)o.className='on';
+document.getElementById('lu').textContent='未连接，请点击顶部「连接设备」';
+}
+function hideOff(){
+var b=document.getElementById('connlost');if(b)b.style.display='none';
+var bg=document.getElementById('bdg');
+if(bg){bg.textContent='扫描中';bg.style.background='';bg.style.color='';bg.style.borderColor='';}
+var o=document.getElementById('ovl');if(o)o.className='';
+}
+function clr(){DS.cmd('CLEAR').then(function(){load()}).catch(function(){})}
+function prune(){DS.cmd('PRUNE').then(function(){load()}).catch(function(){})}
+var selPause=0;
+document.addEventListener('touchstart',function(){selPause=Date.now()+2000;});
+document.addEventListener('selectionchange',function(){var s=window.getSelection?window.getSelection():null;if(s&&!s.isCollapsed){selPause=Date.now()+8000;}});
+var refrTimer=null;
+function startPoll(){
+if(refrTimer)clearInterval(refrTimer);
+var v=parseInt(document.getElementById('refr').value)||1000;
+refrTimer=setInterval(load,v);
+try{localStorage.setItem('refr',v)}catch(e){}
+}
+var sv=null;try{sv=localStorage.getItem('refr')}catch(e){}
+if(sv){var el2=document.getElementById('refr');if(el2)el2.value=sv;}
+var atTimer=null;
+window.scanStart=function(){
+  startPoll();load();
+  if(!atTimer)atTimer=setInterval(function(){var e=document.getElementById('at');if(e)e.textContent=ft((Date.now()-st)/1000)},1000);
+};
+window.scanStop=function(){
+  if(refrTimer){clearInterval(refrTimer);refrTimer=null;}
+  if(atTimer){clearInterval(atTimer);atTimer=null;}
+};
+DS.onStatus(function(s){
+if(s==='ok'){if(cur==='scan'){load();syncCalFromDevice();}}
+else if(s==='lost'||s==='off'){showOff();}
+});
+window.load=load;window.clr=clr;window.prune=prune;window.startPoll=startPoll;window.tog=tog;window.togMore=togMore;
+var lastData=[];
+var cal=null;try{cal=JSON.parse(localStorage.getItem('ridcal')||'null')}catch(e){}
+var P0=(cal&&typeof cal.p0==='number')?cal.p0:-40;
+var N=(cal&&typeof cal.n==='number')?cal.n:2.5;
+function rssiDist(r){if(r>=-35)return 1;if(r<=-95)return 200;return Math.round(Math.pow(10,(P0-r)/(10*N)));}
+var calTimer=null;
+function pushCal(){if(!DS.isConnected())return;DS.cmd('CAL p0='+P0+'&n='+N).catch(function(){});}
+function saveCal(){cal={p0:P0,n:N,d0:(cal&&cal.d0)||0,t:Date.now()};try{localStorage.setItem('ridcal',JSON.stringify(cal))}catch(e){};clearTimeout(calTimer);calTimer=setTimeout(pushCal,400);}
+function syncCalFromDevice(){
+DS.cmd('CAL',4000).then(function(d){if(d&&typeof d.p0==='number'&&typeof d.n==='number'){P0=d.p0;N=d.n;cal={p0:P0,n:N,t:Date.now()};try{localStorage.setItem('ridcal',JSON.stringify(cal))}catch(e){};var o=document.getElementById('calovl');if(o&&o.style.display==='flex')calRefresh();load();}}).catch(function(){});
+}
+function calSelRssi(){var si=parseInt(document.getElementById('calsel').value,10);return(si>=0&&si<lastData.length)?lastData[si].rssi:0;}
+function calRefresh(){
+  var p=document.getElementById('calp0'),n=document.getElementById('caln');
+  if(p)p.value=P0;if(n)n.value=N;
+  var s=document.getElementById('calp0v');if(s)s.textContent=P0;
+  var s2=document.getElementById('calnv');if(s2)s2.textContent=N;
+  var r=calSelRssi(),d=(r&&r!=0)?rssiDist(r):null;
+  var info=document.getElementById('calinfo');
+  if(info)info.textContent='当前信号 '+((r&&r!=0)?r+'dBm':'无')+(d?' → 约 '+d+'m':'')+' ｜ P0='+P0+'dBm · n='+N+(cal&&cal.t?'（已同步到设备 '+new Date(cal.t).toLocaleTimeString('zh-CN')+'）':'（默认值）');
+}
+function openCal(){
+  var o=document.getElementById('calovl');if(!o)return;
+  var sel=document.getElementById('calsel');var opts='';
+  for(var i=0;i<lastData.length;i++){var dd=lastData[i];opts+='<option value="'+i+'">'+(dd.model_name||dd.mac)+' ('+(dd.rssi||0)+'dBm)</option>';}
+  sel.innerHTML=opts||'<option value="-1">暂无无人机数据</option>';
+  calRefresh();o.style.display='flex';load();
+}
+function closeCal(){var o=document.getElementById('calovl');if(!o)return;o.classList.add('closing');setTimeout(function(){o.style.display='none';o.classList.remove('closing')},190);}
+function onP0(){P0=parseFloat(document.getElementById('calp0').value);saveCal();calRefresh();load();}
+function onN(){N=parseFloat(document.getElementById('caln').value);saveCal();calRefresh();load();}
+function doCal(){
+  var d0=parseFloat(document.getElementById('cald').value);
+  var si=parseInt(document.getElementById('calsel').value,10);
+  if(!(d0>0)){alert('请输入有效的已知距离');return;}
+  if(!(si>=0&&si<lastData.length)){alert('请先选择有信号的无人机');return;}
+  var rssi=lastData[si].rssi;
+  if(!rssi||rssi==0){alert('所选无人机无信号（RSSI=0），等它刷新出信号再试');return;}
+  P0=Math.round((rssi+10*N*Math.log10(d0))*10)/10;
+  saveCal();calRefresh();load();
+}
+function resetCal(){try{localStorage.removeItem('ridcal')}catch(e){}cal=null;P0=-40;N=2.5;clearTimeout(calTimer);pushCal();closeCal();load();}
+window.doCal=doCal;window.resetCal=resetCal;window.closeCal=closeCal;window.onP0=onP0;window.onN=onN;
+(function(){
+  var c=document.querySelector('.ctrls');if(c){
+    var b=document.createElement('button');b.className='btn btn2';b.id='calbtn';b.textContent='校准';
+    b.onclick=openCal;c.appendChild(b);}
+  var o=document.createElement('div');
+  o.id='calovl';
+  o.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;align-items:center;justify-content:center';
+  o.innerHTML='<div style="background:#111;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:18px;width:min(92vw,390px);max-height:88vh;overflow:auto">'
+    +'<h3 style="font-size:15px;margin-bottom:10px">RSSI 距离校准</h3>'
+    +'<div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:10px;line-height:1.6">方式一：把无人机/手机放在<b>已知距离</b>处，选目标输入距离自动算。方式二：拖动下方滑条手动微调，实时预览。</div>'
+    +'<select id="calsel" style="width:100%;padding:8px;border-radius:4px;background:#000;color:#fff;border:1px solid rgba(255,255,255,.2);margin-bottom:8px"></select>'
+    +'<div style="display:flex;gap:8px;margin-bottom:8px">'
+    +'<input id="cald" type="number" step="0.5" min="0.5" value="3" style="flex:1;padding:8px;border-radius:4px;background:#000;color:#fff;border:1px solid rgba(255,255,255,.2)" placeholder="已知距离(米)">'
+    +'<button onclick="doCal()" style="padding:8px 14px;border:none;border-radius:4px;background:#4CC2FF;color:#000;font-weight:600;white-space:nowrap">自动校准</button></div>'
+    +'<div style="font-size:12px;margin-bottom:4px;color:rgba(255,255,255,.8)">P0（1 米处信号强度，dBm）<span id="calp0v" style="color:#4CC2FF"></span></div>'
+    +'<input id="calp0" type="range" min="-60" max="-30" step="0.5" oninput="onP0()" style="width:100%;margin-bottom:10px">'
+    +'<div style="font-size:12px;margin-bottom:4px;color:rgba(255,255,255,.8)">n（衰减系数，2 空旷 / 2.5~3 室内）<span id="calnv" style="color:#4CC2FF"></span></div>'
+    +'<input id="caln" type="range" min="1.2" max="4" step="0.1" oninput="onN()" style="width:100%;margin-bottom:10px">'
+    +'<div id="calinfo" style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:10px"></div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button onclick="resetCal()" style="flex:1;padding:9px;border:none;border-radius:4px;background:rgba(255,255,255,.15);color:#fff">重置默认</button>'
+    +'<button onclick="closeCal()" style="flex:1;padding:9px;border:none;border-radius:4px;background:rgba(255,255,255,.15);color:#fff">关闭</button>'
+    +'</div></div>';
+  o.onclick=function(e){if(e.target===o)closeCal();};
+  document.body.appendChild(o);
+})();
+})();
+</script>
+
+<script>
+/* ================= 状态页 ================= */
+(function () {
+function fmtUp(s){s=Math.floor(s);var h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;return(h>0?h+' 小时 ':'')+(m>0?m+' 分 ':'')+sc+' 秒';}
+function fmtK(b){return b>=1048576?(b/1048576).toFixed(2)+' MB':Math.round(b/1024)+' KB';}
+function setT(id,t){var e=document.getElementById(id);if(e)e.textContent=t;}
+function bar(id,pct,color){var e=document.getElementById(id);if(!e)return;e.style.width=Math.max(0,Math.min(100,pct))+'%';if(color)e.style.background=color;}
+var sysBusy=false;
+function sysLoad(){
+  if(sysBusy)return;sysBusy=true;
+  DS.cmd('SYS',4000).then(function(d){
+    if(!d||d.cpu===undefined)return;
+    var cpuC=d.cpu>80?'#FF99A4':(d.cpu>50?'#FCE100':'#6CCB5F');
+    setT('cCpu',d.cpu.toFixed(1)+'%');bar('bCpuF',d.cpu,cpuC);setT('bCpu',d.cpu.toFixed(1)+'%');
+    var hp=Math.round((1-d.heap_free/d.heap_total)*100);
+    setT('cHeap',fmtK(d.heap_free));bar('bHeapF',hp,'#C58AF9');setT('bHeap',fmtK(d.heap_free)+' / '+fmtK(d.heap_total)+'（'+hp+'%）');
+    setT('cPps',Number(d.pps).toFixed(1));setT('cCh',d.channel);
+    var fp=Math.round(d.sketch_used/d.sketch_total*100);
+    bar('bFlashF',fp,'#4CC2FF');setT('bFlash',fmtK(d.sketch_used)+' / '+fmtK(d.sketch_total)+'（'+fp+'%）');
+    setT('rUp',fmtUp(d.uptime_s));setT('rMhz',d.cpu_mhz+' MHz');setT('rHeapT',fmtK(d.heap_total));
+    setT('rHeapMin',fmtK(d.heap_min));setT('rHeapLg',fmtK(d.heap_largest));
+    setT('rFlash',fmtK(d.sketch_used)+' / '+fmtK(d.sketch_total));
+    setT('rTemp',d.chip_temp?d.chip_temp.toFixed(1)+' °C':'--');
+    setT('rPwr',d.chip_pwr_mw?d.chip_pwr_mw+' mW（估算）':'--');
+    setT('rDrn',d.drones);setT('rPkt',Number(d.packets).toLocaleString());
+    setT('rMgmt',Number(d.mgmt).toLocaleString());setT('rAct',Number(d.action).toLocaleString());
+    setT('rNan',Number(d.nan_da).toLocaleString());setT('rRid',Number(d.rid_ie).toLocaleString());
+    setT('nCh',d.channel);setT('nBw',d.bw+' MHz');
+    setT('nTx',d.wifi_tx_power+' dBm（约 '+Math.round(Math.pow(10,d.wifi_tx_power/10))+' mW）');
+    setT('slu','更新: '+new Date().toLocaleTimeString('zh-CN'));
+  }).catch(function(){setT('slu','设备无响应 — 请确认 ESP32 已烧录新固件（串口监视器输入 SYS 应回 JSON 行）');}).then(function(){sysBusy=false;});
+}
+var sysTimer=null;
+window.statusStart=function(){sysLoad();if(sysTimer)clearInterval(sysTimer);sysTimer=setInterval(sysLoad,2000);ledCfgLoad();};
+window.statusStop=function(){if(sysTimer){clearInterval(sysTimer);sysTimer=null;}};
+
+/* ---------- RGB 灯效 ---------- */
+var ledColor='#00ff00', ledBright=100;
+var MODE_NAMES={0:'状态联动',1:'单色固定',2:'彩色轮换',3:'关闭'};
+function hex2rgb(h){h=h.replace('#','');var n=parseInt(h,16)||0;return [n>>16&255,n>>8&255,n&255];}
+function rgb2hex(r,g,b){function p(v){v=Math.max(0,Math.min(255,v|0));return(v<16?'0':'')+v.toString(16);}return '#'+p(r)+p(g)+p(b);}
+function ledCfgLoad(){
+  DS.cmd('LED',3000).then(function(d){
+    if(!d)return;
+    document.getElementById('ledMode').value=String(d.mode||0);
+    ledColor=rgb2hex(d.r,d.g,d.b);document.getElementById('ledColor').value=ledColor;
+    document.getElementById('ledBright').value=d.bright;
+    ledBright=d.bright;
+    var sp=document.getElementById('ledSpeed');if(sp)sp.value=(d.speed==null?50:d.speed);
+    var bo=document.getElementById('ledBoot');if(bo)bo.value=String(d.boot==null?1:d.boot);
+    ledSyncUI();
+  }).catch(function(){});
+}
+function ledSyncUI(){
+  var m=parseInt(document.getElementById('ledMode').value,10);
+  document.getElementById('ledModeV').textContent=MODE_NAMES[m]||('模式'+m);
+  document.getElementById('ledColorRow').style.display=(m===1)?'block':'none';
+  var sr=document.getElementById('ledSpeedRow');
+  if(sr)sr.style.display=(m===2)?'flex':'none';
+  var b=parseInt(document.getElementById('ledBright').value,10);
+  document.getElementById('ledBrightV').textContent=b+'%';
+  var sv=document.getElementById('ledSpeed');if(sv)document.getElementById('ledSpeedV').textContent=sv.value;
+  document.getElementById('ledHex').textContent=document.getElementById('ledColor').value.toUpperCase();
+  ledColor=document.getElementById('ledColor').value;
+  var bo=document.getElementById('ledBoot');var bv=document.getElementById('ledBootV');
+  if(bo&&bv)bv.textContent=(bo.value==='2')?'直接显示（不闪）':((bo.value==='0')?'自检轮播':'快速白闪');
+}
+function ledQ(){var sp=document.getElementById('ledSpeed');return 'mode='+document.getElementById('ledMode').value+'&boot='+document.getElementById('ledBoot').value+'&speed='+(sp?sp.value:50)+'&r='+hex2rgb(ledColor)[0]+'&g='+hex2rgb(ledColor)[1]+'&b='+hex2rgb(ledColor)[2]+'&bright='+document.getElementById('ledBright').value;}
+var ledAutoTimer=null;
+function ledAutoPreview(){if(ledAutoTimer)clearTimeout(ledAutoTimer);ledAutoTimer=setTimeout(function(){ledPreview();},250);}
+function ledPreview(){DS.cmd('LED '+ledQ(),3000).then(function(){var i=document.getElementById('ledInfo');if(i)i.textContent='已发送到设备预览。点「保存」写入 NVS。';}).catch(function(){var i=document.getElementById('ledInfo');if(i)i.textContent='预览失败：命令未送达（检查串口连接）。';});}
+function ledSave(){DS.cmd('LED '+ledQ(),3000).then(function(){var i=document.getElementById('ledInfo');if(i)i.textContent='已保存到设备（NVS），重启后仍生效。';}).catch(function(){var i=document.getElementById('ledInfo');if(i)i.textContent='保存失败：命令未送达（检查串口连接）。';});}
+(function(){
+  var m=document.getElementById('ledMode');if(m)m.addEventListener('change',ledSyncUI);
+  var c=document.getElementById('ledColor');if(c)c.addEventListener('input',function(){ledColor=c.value;ledSyncUI();ledAutoPreview();});
+  var b=document.getElementById('ledBright');if(b)b.addEventListener('input',function(){ledBright=parseInt(b.value,10);ledSyncUI();ledAutoPreview();});
+  var sp=document.getElementById('ledSpeed');if(sp)sp.addEventListener('input',function(){ledSyncUI();ledAutoPreview();});
+  var mo=document.getElementById('ledMode');if(mo)mo.addEventListener('change',function(){ledSyncUI();ledAutoPreview();});
+  var bo=document.getElementById('ledBoot');if(bo)bo.addEventListener('change',function(){ledSyncUI();ledAutoPreview();});
+  var p=document.getElementById('ledPreview');if(p)p.addEventListener('click',ledPreview);
+  var s=document.getElementById('ledSave');if(s)s.addEventListener('click',ledSave);
+  ledSyncUI();
+})();
+DS.onStatus(function(s){
+  if(s==='ok'){if(cur==='status')sysLoad();}
+  else if(s==='lost'||s==='off'){setT('slu','未连接设备 — 点击顶部「连接设备」');}
+});
+})();
+</script>
+</body>
+</html>

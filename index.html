@@ -143,6 +143,7 @@ svg.i .fd{fill:currentColor;stroke:none}
 #p-scan .cat-tag.c1{background:rgba(76,194,255,.15);color:#4CC2FF}
 #p-scan .cat-tag.c2{background:rgba(197,138,249,.15);color:#C58AF9}
 #p-scan .cat-tag.c3{background:rgba(252,225,0,.15);color:#FCE100}
+#p-scan .cat-tag.c4{background:rgba(255,159,67,.15);color:#FF9F43}
 #p-scan .arrow{color:rgba(255,255,255,.36);display:flex;transition:transform .3s;flex-shrink:0}
 #p-scan .arrow svg{width:14px;height:14px}
 #p-scan .item.exp .arrow{transform:rotate(90deg)}
@@ -163,7 +164,7 @@ svg.i .fd{fill:currentColor;stroke:none}
 #p-scan .di.fw{grid-column:span 2}
 #p-scan .di.hw{grid-column:span 2}
 #p-scan .di.sn .vl{white-space:normal;word-break:break-all;font-size:11px}
-#p-scan .empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,.36)}
+#p-scan .empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,.36);grid-column:1/-1}
 #p-scan .empty .radar{position:relative;width:104px;height:104px;margin:0 auto 18px;border-radius:50%;border:1px solid rgba(76,194,255,.2);background:radial-gradient(circle,rgba(76,194,255,.05),transparent 62%)}
 #p-scan .empty .radar::before{content:'';position:absolute;inset:16px;border-radius:50%;border:1px solid rgba(76,194,255,.16)}
 #p-scan .empty .radar::after{content:'';position:absolute;inset:34px;border-radius:50%;border:1px solid rgba(76,194,255,.12)}
@@ -200,6 +201,27 @@ svg.i .fd{fill:currentColor;stroke:none}
 #p-scan .empty .radar{width:112px;height:112px}
 }
 @media(hover:hover){#p-scan .item:hover{transform:translateY(-1px);background:rgba(255,255,255,.24)}}
+#mapbtn.on{background:rgba(76,194,255,.22);color:#4CC2FF}
+#mapbox{display:none;position:relative;margin:0 16px 6px;height:min(66vh,600px);border:1px solid rgba(255,255,255,.16);border-radius:8px;overflow:hidden;background:#07070c}
+#mapbox.on{display:block}
+#mapel{position:absolute;inset:0}
+#mplegend{position:absolute;left:8px;bottom:8px;z-index:1000;background:rgba(7,7,12,.82);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:7px 10px;font-size:11px;line-height:1.9;color:rgba(255,255,255,.79);pointer-events:none;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#mplegend b{display:block;color:#fff;font-size:10px;letter-spacing:2px;margin-bottom:2px}
+#mplegend div{display:flex;align-items:center}
+#mplegend i{display:inline-block;width:9px;height:9px;margin-right:6px;flex-shrink:0;border-radius:50%}
+#mpfit{position:absolute;right:8px;bottom:8px;z-index:1000;background:rgba(7,7,12,.85);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#mpfit:active{transform:scale(.97)}
+.leaflet-container{background:#07070c;font-family:inherit}
+.leaflet-control-attribution{background:rgba(7,7,12,.72)!important;color:rgba(255,255,255,.45)!important;font-size:9px!important}
+.leaflet-control-attribution a{color:#4CC2FF!important}
+.leaflet-popup-content-wrapper{background:rgba(12,12,18,.96);color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.55)}
+.leaflet-popup-content{font-size:12px;line-height:1.65;margin:10px 13px}
+.leaflet-popup-tip{background:rgba(12,12,18,.96)}
+.leaflet-bar a,.leaflet-bar a:hover{background:#15151c!important;color:#fff!important;border-bottom-color:rgba(255,255,255,.18)!important}
+.leaflet-control-layers{border:1px solid rgba(255,255,255,.2)!important;border-radius:8px!important;overflow:hidden}
+.leaflet-control-layers-toggle{background-color:#15151c}
+@media(max-width:899px){#mapbox{margin:0 8px 4px;height:58vh}}
+@media(min-width:900px){#mapbox{height:min(52vh,540px)}}
 #wrap{position:relative}
 #ovl{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.82);border-radius:8px;text-align:center;padding:24px;z-index:5;pointer-events:none}
 #ovl.on{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
@@ -207,7 +229,6 @@ svg.i .fd{fill:currentColor;stroke:none}
 @keyframes ovlPulse{50%{opacity:.5}}
 #ovt1{font-size:17px;font-weight:600;color:#fff}
 #ovt2{font-size:12px;color:rgba(255,255,255,.6);line-height:1.6;max-width:280px}
-#connlost{animation:fadeIn .3s ease-out}
 #fullwarn{animation:fadeIn .3s ease-out}
 #calovl{animation:fadeIn .25s ease-out}
 #calovl>div{animation:calPop .3s cubic-bezier(.2,.9,.3,1)}
@@ -273,7 +294,6 @@ svg.i .fd{fill:currentColor;stroke:none}
 
 <section id="p-scan" class="page">
 <div class="hd"><button onclick="go('home')" style="background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer;font-family:inherit;margin-right:8px;flex-shrink:0">&larr; 返回</button><h1>无人机探测</h1><div class="badge" id="bdg">扫描中</div></div>
-<div id="connlost" style="display:none;background:rgba(255,153,164,.12);color:#FF99A4;margin:10px 16px 0;padding:12px 14px;border-radius:4px;text-align:center;font-size:14px;font-weight:600"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg> 未连接 — 请点击顶部「连接设备」；已连接却无数据时，请确认 ESP32 已烧录新固件（串口监视器输入 SYS 应回 JSON 行）</div>
 <div id="fullwarn" style="display:none;background:rgba(252,225,0,.12);color:#FCE100;margin:10px 16px 0;padding:10px 14px;border-radius:4px;font-size:12px;line-height:1.6;text-align:center"><span id="fwmsg"></span><span style="display:flex;gap:8px;justify-content:center;margin-top:6px"><button onclick="prune()" id="fwprune" style="background:rgba(252,225,0,.15);color:#FCE100;border:1px solid #FCE100;border-radius:4px;padding:4px 12px;font-size:12px">删除失联目标</button><button onclick="clr()" style="background:rgba(255,153,164,.15);color:#FF99A4;border:1px solid #FF99A4;border-radius:4px;padding:4px 12px;font-size:12px">清空全部</button></span></div>
 <div id="prevhint" style="display:none;background:rgba(252,225,0,.1);color:#FCE100;margin:10px 16px 0;padding:10px 14px;border-radius:4px;text-align:center;font-size:12px;line-height:1.5"></div>
 <div class="stats">
@@ -294,8 +314,10 @@ svg.i .fd{fill:currentColor;stroke:none}
     <option value="10000">刷新 10s</option>
   </select>
   <button class="btn btn2" onclick="clr()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>清空</button>
+  <button class="btn btn2" id="mapbtn" onclick="toggleMap()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>地图</button>
+  <button class="btn btn2" id="beepbtn" onclick="toggleBeep()" title="侦测到新目标时播放两声提示音">提示音:关</button>
 </div>
-<div id="wrap"><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
+<div id="wrap"><div id="mapbox"><div id="mapel"></div><div id="mplegend"><b>图例</b><div><i style="background:#6CCB5F"></i>信号强（&gt;-70dBm）</div><div><i style="background:#FCE100"></i>信号弱 / 无RSSI</div><div><i style="background:#FF99A4"></i>信号很差</div><div><i style="background:#8a8a8a;opacity:.55"></i>失联 &gt; 5秒</div><div><i style="border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></i>飞手位置</div><div><i style="height:0;width:12px;border-radius:0;border-top:2px solid #4CC2FF"></i>飞行轨迹</div></div><button id="mpfit" onclick="mpFitAll()">适应范围</button></div><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
 <div class="lu" id="lu">--</div>
 </section>
 
@@ -446,10 +468,78 @@ return [lat+dLat,lon+dLon];}
 function amapUrl(n,lat,lon){var g=wgs2gcj(lat,lon);return (IS_IOS?'iosamap':'androidamap')+'://viewMap?sourceApplication=DroneScanner&poiname='+encodeURIComponent(n)+'&lat='+g[0].toFixed(6)+'&lon='+g[1].toFixed(6)+'&dev=0';}
 function webMapUrl(n,lat,lon){var g=wgs2gcj(lat,lon);return 'https://uri.amap.com/marker?position='+g[1].toFixed(6)+','+g[0].toFixed(6)+'&name='+encodeURIComponent(n);}
 function rc(r){if(r>-70)return'#6CCB5F';if(r>-55)return'#A3C24D';if(r>-40)return'#FCE100';return'#FF99A4'}
-  function cc(c){if(!c)return'c3';if(c.indexOf('consumer')>=0)return'c0';if(c.indexOf('fpv')>=0)return'c1';if(c.indexOf('enterprise')>=0)return'c2';return'c3'}
+function cc(c){if(!c)return'c3';if(c.indexOf('消费')>=0||c.indexOf('consumer')>=0)return'c0';if(c.indexOf('穿越')>=0||c.indexOf('fpv')>=0)return'c1';if(c.indexOf('行业')>=0||c.indexOf('enterprise')>=0||c.indexOf('测绘')>=0)return'c2';if(c.indexOf('植保')>=0||c.indexOf('物流')>=0)return'c4';return'c3'}
 function endAnim(a,c,cls,fb,ex){var done=0;function fin(){if(done)return;done=1;a.style.maxHeight='';for(var k=0;k<cls.length;k++)c.classList.remove(cls[k]);if(ex)ex();}function onEnd(ev){if(ev.target===a&&ev.propertyName==='max-height'){a.removeEventListener('transitionend',onEnd);fin();}}a.addEventListener('transitionend',onEnd);setTimeout(fin,fb);}
 function tog(id){var e=document.getElementById(id);if(!e)return;var d=e.querySelector('.detail');if(!d)return;selPause=Date.now()+900;if(e.classList.contains('exp')){d.style.maxHeight=d.scrollHeight+'px';void d.offsetWidth;e.classList.add('closing');d.style.maxHeight='0px';endAnim(d,e,['exp','closing'],1500)}else{e.classList.add('anim');e.classList.add('exp');void d.offsetWidth;d.style.maxHeight=d.scrollHeight+'px';endAnim(d,e,['anim'],1500)}}
 function togMore(id){var e=document.getElementById(id);if(!e)return;var b=e.previousElementSibling;var on=e.style.display==='block'||e.style.display==='grid';selPause=Date.now()+900;if(!on){e.style.display='block';e.classList.add('anim');void e.offsetWidth;e.style.maxHeight=e.scrollHeight+'px';endAnim(e,e,['anim'],1500)}else{e.style.maxHeight=e.scrollHeight+'px';void e.offsetWidth;e.classList.add('closing');e.style.maxHeight='0px';endAnim(e,e,['closing'],1500,function(){e.style.display='none'})}if(b)b.classList.toggle('on',!on)}
+var UAV_MODELS=[
+['1581F8LQ','Mavic 4 Pro','消费级'],['1581F67Q','Mavic 3 Pro','消费级'],['1581F5Y8','Mavic 3 Classic','消费级'],
+['1581F45Q','Mavic 3','消费级'],['1581F45T','Mavic 3','消费级'],['1581F895','Air 3S','消费级'],
+['1581F6N8','Air 3','消费级'],['1581F385','Air 2S','消费级'],['1581F3YT','Air 2S','消费级'],
+['1581FANL','Mini 5 Pro','消费级'],['1581F9DE','Mini 5 Pro','消费级'],['1581F5QJ','Mini 4 Pro','消费级'],
+['1581F6Z9','Mini 4 Pro','消费级'],['1581F8C8','Mini 4K','消费级'],['1581F8PJ','Mini 4K','消费级'],
+['1581F4XF','Mini 3 Pro','消费级'],['1581F5YH','Mini 3','消费级'],['1581F6CD','Mini 2 SE','消费级'],
+['1581FA8J','Avata 360','消费级'],['1581FBLK','Avata 360','消费级'],['1581FBV5','Lito 1','消费级'],
+['1581F67P','Mavic 3 Classic','消费级'],['1581F6MK','Mavic 3 Pro Cine','消费级'],
+['1581F0M6','Mavic 2 Zoom','消费级'],['1581F163','Mavic 2 Pro','消费级'],['1581F11V','Phantom 4 Pro V2.0','消费级'],
+['1581F1WN','Mavic Air 2','消费级'],['1581F3N3','Mavic Air 2','消费级'],['1778S000','SplashDrone 4','消费级'],
+['1748CHL2','EVO II','消费级'],['1748CHL7','EVO II','消费级'],['1748FEV2','EVO II V3','消费级'],
+['1748CLT0','EVO Lite','消费级'],['1748CLTG','EVO Lite','消费级'],['1748CLTC','EVO Lite+','消费级'],
+['1748CNA0','EVO Nano','消费级'],['1748CNAG','EVO Nano','消费级'],
+['11223344','Anafi','消费级'],['PF723000','Rolling Spider','消费级'],['PF727078','Mambo FLY','消费级'],
+['YUNQ4KPUS','Q500 4K Typhoon','消费级'],['P208904','Skydio 2/2+','消费级'],
+['1581F87L','Neo','穿越机'],['1581F6W8','Avata 2','穿越机'],['1581F4CQ','Avata','穿越机'],
+['1581F4QW','Avata','穿越机'],['1581FA6Q','Neo 2','穿越机'],['1581F8A1','Neo','穿越机'],
+['1581F3CQ','DJI FPV','穿越机'],['1581F37Q','FPV','穿越机'],['1581F7V2','DJI Flip','穿越机'],
+['1581F6H8','Matrice 350 RTK','行业级'],['1581F6GK','M350 RTK','行业级'],['1581F5BK','Matrice 30','行业级'],
+['1581F4BN','M30','行业级'],['1581F62H','M30T','行业级'],['1581F5BL','M30 Dock version','行业级'],
+['1581F5BM','M30T Dock version','行业级'],['1581F52Q','Mavic 3E/3T','行业级'],['1581F578','Inspire 3','行业级'],
+['1581F4Z4','Inspire 3','行业级'],['1581F4GC','Mavic 2 Enterprise Advanced','行业级'],['1581F1ZN','M300 RTK','行业级'],
+['1581F0UY','Phantom 4 RTK','行业级'],['1581F5FJ','M3T','行业级'],['1581F5FH','M3E','行业级'],
+['1581F5FK','M3M','行业级'],['1581FBEX','M3TA','行业级'],['1581F6QA','M3D','行业级'],
+['1581F6Q8','M3TD','行业级'],['1581F7FV','Matrice 4E','行业级'],['1581F7K3','Matrice 4T','行业级'],
+['1581F8DB','Matrice 400','行业级'],['1581F8HH','Matrice 4D','行业级'],['1581F8HG','Matrice 4TD','行业级'],
+['1748CJD1','Dragonfish Standard','行业级'],['1748CJD2','Dragonfish Lite','行业级'],['1748CJD3','Dragonfish Pro','行业级'],
+['1748FEV3','EVO Max/MDX-1','行业级'],['1748FEV4','Autel Alpha','行业级'],
+['1588E040','Anafi AI','行业级'],['44332211','Anafi USA','行业级'],
+['YUNH5ETWET','H520 Hexacopter','行业级'],['YUNTYH3EU','Typhoon H3','行业级'],
+['SDR21V1','Skydio X2E','行业级'],['SDR35V1','Skydio X2','行业级'],['SR47PCV','Skydio X10','行业级'],
+['1701A000','Percepto Max','行业级'],['1701A001','Percepto Sparrow','行业级'],['1701A002','Percepto Air','行业级'],
+['1587A000','AgEagle eBee X','测绘级'],['1587A001','AgEagle eBee TAC','测绘级'],['1587A002','AgEagle eBee Geo','测绘级'],
+['1587A003','AgEagle eBee RTK','测绘级'],['1567A000','md4-1000','测绘级'],['1567A001','md4-3000','测绘级'],
+['1688W000','WingtraOne Gen II','测绘级'],['1688W001','WingtraOne GEN I','测绘级'],
+['18179000','Alta X','影视级'],['18179001','Alta X Gen2','影视级'],['18179002','Alta 8','影视级'],
+['1581F446','Agras T10/T30','植保级'],['1581F574','Agras T20P/T40','植保级'],['1581F6BU','Agras T50','植保级'],
+['1581F836','Agras T25P','植保级'],['1581F8ZL','Agras T100','植保级'],['1581F8ZX','Agras T70P','植保级'],
+['1581FAE3','Agras T70S','植保级'],['1758X000','P150 Max','植保级'],['1758X001','P100 Pro','植保级'],
+['1758X002','P100','植保级'],['1758X003','V40','植保级'],
+['1581F7C6','FlyCart 30','物流级'],['1581FAN4','FlyCart 100','物流级']
+];
+function djLookup(id){
+  if(!id)return null;
+  id=String(id);
+  for(var i=0;i<UAV_MODELS.length;i++)if(id.indexOf(UAV_MODELS[i][0])===0)return UAV_MODELS[i];
+  return null;
+}
+var DRONE_MACS=[
+['04A85A','大疆'],['0C9AE6','大疆'],['201F55','大疆'],['34D262','大疆'],['481CB9','大疆'],
+['4C43F6','大疆'],['58B858','大疆'],['60601F','大疆'],['882985','大疆'],['8C5823','大疆'],
+['9C5A8A','大疆'],['E47A2C','大疆'],
+['18D793','道通 Autel'],['EC5BCD','道通 Autel'],
+['381D14','Skydio'],['B030C8','Teal'],
+['9003B7','Parrot'],['903AE6','Parrot'],['A0143D','Parrot'],
+['547D40','臻迪 Powervision'],['98AAFC','哈博森 Hubsan'],['B41E52','Flock Safety']
+];
+function macVendor(mac){
+  if(!mac)return null;
+  var m=String(mac).replace(/[^0-9A-Fa-f]/g,'').toUpperCase();
+  if(m.length<6)return null;
+  if(parseInt(m.charAt(1),16)&2)return null;
+  m=m.slice(0,6);
+  for(var i=0;i<DRONE_MACS.length;i++)if(m===DRONE_MACS[i][0])return DRONE_MACS[i][1];
+  return null;
+}
+function nbRow(lb,extra){return '<div class="di'+(extra||'')+'"><div class="lb">'+lb+'</div><div class="vl" style="color:rgba(255,255,255,.45)">未广播</div></div>';}
 function load(){
 var expanded={};
 var els=document.querySelectorAll('.item.exp');
@@ -458,7 +548,8 @@ var moreOpen={};
 var mels=document.querySelectorAll('.more');
 for(var k=0;k<mels.length;k++){if(mels[k].style.display==='block'||mels[k].style.display==='grid')moreOpen[mels[k].id]=1;}
 if(!DS.isConnected()){if(offTimer)clearTimeout(offTimer);showOff();return;}
-DS.cmd('DRONES',4000).then(function(data){
+ DS.cmd('DRONES',4000).then(function(data){
+  try{
   if(offTimer){clearTimeout(offTimer);offTimer=null;}
   if(Date.now()<selPause)return;   // 用户正在触摸/选择文本时暂停重绘，防止长按复制被打断
   okN++;
@@ -469,6 +560,17 @@ DS.cmd('DRONES',4000).then(function(data){
   setNum('pr',data.pps||0);
   var prevMacs=lastData?lastData.map(function(x){return x.mac}):null;
   var ds=data.drones||[],h='';lastData=ds;
+  for(var qi=0;qi<ds.length;qi++){
+    var qd=ds[qi],qm=djLookup(qd.uav_id),qv=qm?null:macVendor(qd.mac);
+    if(qm){qd.model_name=qm[1];qd.model_cat=qm[2];}
+    else if(qv&&!qd.model_name)qd.model_name=qv+'设备';
+  }
+  if(BEEP&&prevMacs){
+    var hadNew=false;
+    for(var bi=0;bi<ds.length;bi++){var bm=ds[bi].mac;if(bm&&prevMacs.indexOf(bm)<0){hadNew=true;break;}}
+    var tn2=Date.now();
+    if(hadNew&&tn2-lastBeep>3000){lastBeep=tn2;playBeep();}
+  }
   var fw=document.getElementById('fullwarn');
   if(fw){
     var used=ds.length,sl=data.slots||50;
@@ -522,50 +624,51 @@ DS.cmd('DRONES',4000).then(function(data){
       h+='</div>';
       h+='<div class="detail"><div class="dg">';
       h+='<div class="di"><div class="lb">MAC 地址</div><div class="vl">'+d.mac+'</div></div>';
-      if(d.uav_id)h+='<div class="di sn"><div class="lb">序列号</div><div class="vl">'+d.uav_id+'</div></div>';
-      if(d.uav_id2)h+='<div class="di sn"><div class="lb">'+(IDTYPEMAP[d.id_type2]||'附加标识')+'</div><div class="vl">'+d.uav_id2+'</div></div>';
+      if(d.uav_id)h+='<div class="di sn"><div class="lb">序列号</div><div class="vl">'+d.uav_id+'</div></div>';else h+=nbRow('序列号',' sn');
+      if(d.uav_id2)h+='<div class="di sn"><div class="lb">'+(IDTYPEMAP[d.id_type2]||'附加标识')+'</div><div class="vl">'+d.uav_id2+'</div></div>';else h+=nbRow(IDTYPEMAP[d.id_type2]||'附加标识',' sn');
       if(d.op_id)h+='<div class="di"><div class="lb">操作员</div><div class="vl">'+d.op_id+'</div></div>';
       else if(d.sys_op_id)h+='<div class="di"><div class="lb">操作员（系统）</div><div class="vl">'+(OIDTYPEMAP[d.sys_op_id_type]?OIDTYPEMAP[d.sys_op_id_type]+' · ':'')+d.sys_op_id+'</div></div>';
+      else h+=nbRow('操作员');
       if(dm)h+='<div class="di fw"><div class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8 7.2 5M12 14.2l-4.8 4.8M12 14.2l4.8 4.8M12 9.8l4.8-4.8"/><circle cx="5.5" cy="5.5" r="1.6"/><circle cx="18.5" cy="5.5" r="1.6"/><circle cx="5.5" cy="18.5" r="1.6"/><circle cx="18.5" cy="18.5" r="1.6"/></svg>无人机位置</div><div class="vl">'+d.lat.toFixed(6)+', '+d.lon.toFixed(6)+' <a href="'+amapUrl('无人机位置',d.lat,d.lon)+'">📍 地图App</a> · <a href="'+webMapUrl('无人机位置',d.lat,d.lon)+'" target="_blank">网页版</a></div></div>';
       if(pm)h+='<div class="di fw"><div class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-6.5-5-6.5-10a6.5 6.5 0 0 1 13 0c0 5-6.5 10-6.5 10Z"/><circle cx="12" cy="10.2" r="2.3"/></svg>飞手位置</div><div class="vl">'+d.base_lat.toFixed(6)+', '+d.base_lon.toFixed(6)+' <a href="'+amapUrl('飞手位置',d.base_lat,d.base_lon)+'">📍 地图App</a> · <a href="'+webMapUrl('飞手位置',d.base_lat,d.base_lon)+'" target="_blank">网页版</a></div></div>';
-      if(!dm)h+='<div class="di fw"><div class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8 7.2 5M12 14.2l-4.8 4.8M12 14.2l4.8 4.8M12 9.8l4.8-4.8"/><circle cx="5.5" cy="5.5" r="1.6"/><circle cx="18.5" cy="5.5" r="1.6"/><circle cx="5.5" cy="18.5" r="1.6"/><circle cx="18.5" cy="18.5" r="1.6"/></svg>无人机位置</div><div class="vl" style="color:rgba(255,255,255,.45)">未获取定位 — 无人机暂无 GNSS 信号（地面/室内停放时不广播坐标），室外起飞后自动出现</div></div>';
-      if(!pm)h+='<div class="di fw"><div class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-6.5-5-6.5-10a6.5 6.5 0 0 1 13 0c0 5-6.5 10-6.5 10Z"/><circle cx="12" cy="10.2" r="2.3"/></svg>飞手位置</div><div class="vl" style="color:rgba(255,255,255,.45)">未广播飞手位置</div></div>';
-      if(d.height_agl!==undefined&&d.height_agl>-999)h+='<div class="di"><div class="lb">相对高度</div><div class="vl">'+d.height_agl+' m'+(d.height_type===1?'（相对地面）':(d.height_type===0?'（相对起飞点）':''))+'</div></div>';
-      if(d.alt!==undefined&&d.alt>-999)h+='<div class="di"><div class="lb">绝对高度（海平面）</div><div class="vl">'+d.alt+' m</div></div>';
+      if(!dm)h+='<div class="di fw"><div class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8 7.2 5M12 14.2l-4.8 4.8M12 14.2l4.8 4.8M12 9.8l4.8-4.8"/><circle cx="5.5" cy="5.5" r="1.6"/><circle cx="18.5" cy="5.5" r="1.6"/><circle cx="5.5" cy="18.5" r="1.6"/><circle cx="18.5" cy="18.5" r="1.6"/></svg>无人机位置</div><div class="vl" style="color:rgba(255,255,255,.45)">未广播</div></div>';
+      if(!pm)h+='<div class="di fw"><div class="lb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-6.5-5-6.5-10a6.5 6.5 0 0 1 13 0c0 5-6.5 10-6.5 10Z"/><circle cx="12" cy="10.2" r="2.3"/></svg>飞手位置</div><div class="vl" style="color:rgba(255,255,255,.45)">未广播</div></div>';
+      if(d.height_agl!==undefined&&d.height_agl>-999)h+='<div class="di"><div class="lb">相对高度</div><div class="vl">'+d.height_agl+' m'+(d.height_type===1?'（相对地面）':(d.height_type===0?'（相对起飞点）':''))+'</div></div>';else h+=nbRow('相对高度');
+      if(d.alt!==undefined&&d.alt>-999)h+='<div class="di"><div class="lb">绝对高度（海平面）</div><div class="vl">'+d.alt+' m</div></div>';else h+=nbRow('绝对高度（海平面）');
       var spd='';
       if(d.speed!==undefined)spd+='水平 '+d.speed+' m/s';
       if(d.speed_vertical!==undefined)spd+=(spd?' · ':'')+'垂直 '+d.speed_vertical+' m/s';
-      if(spd)h+='<div class="di hw"><div class="lb">速度</div><div class="vl">'+spd+'</div></div>';
-      if(d.heading!==undefined&&d.heading!==null&&d.heading>=0&&d.heading<=360)h+='<div class="di"><div class="lb">航向</div><div class="vl">'+d.heading+'°</div></div>';else h+='<div class="di"><div class="lb">航向</div><div class="vl" style="color:rgba(255,255,255,.45)">未广播（无人机未发送方向）</div></div>';   // 361=无效航向→灰色占位
-      if(d.desc&&d.desc.length>0)h+='<div class="di fw"><div class="lb">描述</div><div class="vl">'+d.desc+'</div></div>';
-      if(d.status!==undefined&&d.status!==null)h+='<div class="di"><div class="lb">飞行状态</div><div class="vl">'+(STMAP[d.status]||d.status)+'</div></div>';
+      if(spd)h+='<div class="di hw"><div class="lb">速度</div><div class="vl">'+spd+'</div></div>';else h+=nbRow('速度',' hw');
+      if(d.heading!==undefined&&d.heading!==null&&d.heading>=0&&d.heading<=360)h+='<div class="di"><div class="lb">航向</div><div class="vl">'+d.heading+'°</div></div>';else h+=nbRow('航向');   // 361=无效航向→灰色占位
+      if(d.desc&&d.desc.length>0)h+='<div class="di fw"><div class="lb">描述</div><div class="vl">'+d.desc+'</div></div>';else h+=nbRow('描述',' fw');
+      if(d.status!==undefined&&d.status!==null)h+='<div class="di"><div class="lb">飞行状态</div><div class="vl">'+(STMAP[d.status]||d.status)+'</div></div>';else h+=nbRow('飞行状态');
       if(d.first_seen!==undefined)h+='<div class="di"><div class="lb">首次发现</div><div class="vl">'+fmtAgo(d.first_seen)+'</div></div>';
-      if(d.sys_ts&&d.sys_ts>1000000000){var lt=Math.round(Date.now()/1000-d.sys_ts);h+='<div class="di"><div class="lb">消息延迟</div><div class="vl">'+(lt>=0?(lt+' 秒'):'时间超前')+'</div></div>';}
-      if(d.loc_ts!==undefined&&d.loc_ts!==null&&d.loc_ts>=0&&d.loc_ts<3600){var s=d.loc_ts,hh2=Math.floor(s/3600),mm2=Math.floor((s%3600)/60),ss2=s%60;h+='<div class="di"><div class="lb">定位时间</div><div class="vl">整点后 '+(hh2<10?'0':'')+hh2+':'+(mm2<10?'0':'')+mm2+':'+(ss2<10?'0':'')+ss2+'</div></div>';}
-      if(d.auth_type&&AUTHTYPEMAP[d.auth_type])h+='<div class="di"><div class="lb">认证</div><div class="vl">'+AUTHTYPEMAP[d.auth_type]+(d.auth_len?' · '+d.auth_len+'字节':'')+(d.auth_pages>1?' · 共'+d.auth_pages+'页':'')+(d.auth_timestamp?' · '+new Date(d.auth_timestamp*1000).toLocaleString('zh-CN'):'')+'</div></div>';
+      if(d.sys_ts&&d.sys_ts>1000000000){var lt=Math.round(Date.now()/1000-d.sys_ts);h+='<div class="di"><div class="lb">消息延迟</div><div class="vl">'+(lt>=0?(lt+' 秒'):'时间超前')+'</div></div>';}else h+=nbRow('消息延迟');
+      if(d.loc_ts!==undefined&&d.loc_ts!==null&&d.loc_ts>=0&&d.loc_ts<3600){var s=d.loc_ts,hh2=Math.floor(s/3600),mm2=Math.floor((s%3600)/60),ss2=s%60;h+='<div class="di"><div class="lb">定位时间</div><div class="vl">整点后 '+(hh2<10?'0':'')+hh2+':'+(mm2<10?'0':'')+mm2+':'+(ss2<10?'0':'')+ss2+'</div></div>';}else h+=nbRow('定位时间');
+      if(d.auth_type&&AUTHTYPEMAP[d.auth_type])h+='<div class="di"><div class="lb">认证</div><div class="vl">'+AUTHTYPEMAP[d.auth_type]+(d.auth_len?' · '+d.auth_len+'字节':'')+(d.auth_pages>1?' · 共'+d.auth_pages+'页':'')+(d.auth_timestamp?' · '+new Date(d.auth_timestamp*1000).toLocaleString('zh-CN'):'')+'</div></div>';else h+=nbRow('认证');
       h+='<div class="di"><div class="lb">最后活跃</div><div class="vl">'+fmtAgo(d.last_seen)+'</div></div>';
       h+='<div class="morebtn'+(moreOpen['more'+i]?' on':'')+'" onclick="togMore(\'more'+i+'\')"><span>更多信息</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></div>';
       h+='<div class="more" id="more'+i+'"'+(moreOpen['more'+i]?' style="display:block"':'')+'><div class="dg">';
       var g1='',g2='',g3='',g4='',g5='';
-      if(d.uatype!==undefined&&d.uatype!==null)g1+='<div class="di"><div class="lb">机型类别</div><div class="vl">'+(UAMAP[d.uatype]||d.uatype)+'</div></div>';
-      if(d.id_type!==undefined&&d.id_type!==null)g1+='<div class="di"><div class="lb">标识类型</div><div class="vl">'+(IDTYPEMAP[d.id_type]||d.id_type)+'</div></div>';
-      if(d.op_id_type!==undefined&&d.op_id_type!==null)g1+='<div class="di"><div class="lb">OID 类型</div><div class="vl">'+(OIDTYPEMAP[d.op_id_type]||d.op_id_type)+'</div></div>';
-      if(d.desc_type!==undefined&&d.desc_type!==null)g1+='<div class="di"><div class="lb">描述类型</div><div class="vl">'+(DESCTYPEMAP[d.desc_type]||d.desc_type)+'</div></div>';
-      if(d.hor_acc!==undefined&&d.hor_acc!==null)g2+='<div class="di fw"><div class="lb">定位精度</div><div class="vl">水平 '+(HORACC[d.hor_acc]||d.hor_acc)+' · 垂直 '+(VERACC[d.ver_acc]||d.ver_acc)+' · 速度 '+(SPDACC[d.speed_acc]||d.speed_acc)+(d.baro_acc!==undefined&&d.baro_acc!==null?' · 气压 '+(VERACC[d.baro_acc]||d.baro_acc):'')+(d.ts_acc!==undefined&&d.ts_acc!==null?' · 时间 '+(d.ts_acc?(d.ts_acc/10)+'s':'未知'):'')+'</div></div>';
-      if(d.op_loc_type!==undefined&&d.op_loc_type!==null)g2+='<div class="di"><div class="lb">飞手位置</div><div class="vl">'+(OPLOC[d.op_loc_type]||d.op_loc_type)+'</div></div>';
-      if(d.alt_baro!==undefined&&d.alt_baro>-999)g2+='<div class="di"><div class="lb">气压高度</div><div class="vl">'+d.alt_baro+' m</div></div>';
-      if(d.op_alt_geo!==undefined&&d.op_alt_geo>-999)g2+='<div class="di"><div class="lb">操作员海拔</div><div class="vl">'+d.op_alt_geo+' m</div></div>';
+      if(d.uatype!==undefined&&d.uatype!==null)g1+='<div class="di"><div class="lb">机型类别</div><div class="vl">'+(UAMAP[d.uatype]||d.uatype)+'</div></div>';else g1+=nbRow('机型类别');
+      if(d.id_type!==undefined&&d.id_type!==null)g1+='<div class="di"><div class="lb">标识类型</div><div class="vl">'+(IDTYPEMAP[d.id_type]||d.id_type)+'</div></div>';else g1+=nbRow('标识类型');
+      if(d.op_id_type!==undefined&&d.op_id_type!==null)g1+='<div class="di"><div class="lb">OID 类型</div><div class="vl">'+(OIDTYPEMAP[d.op_id_type]||d.op_id_type)+'</div></div>';else g1+=nbRow('OID 类型');
+      if(d.desc_type!==undefined&&d.desc_type!==null)g1+='<div class="di"><div class="lb">描述类型</div><div class="vl">'+(DESCTYPEMAP[d.desc_type]||d.desc_type)+'</div></div>';else g1+=nbRow('描述类型');
+      if(d.hor_acc!==undefined&&d.hor_acc!==null)g2+='<div class="di fw"><div class="lb">定位精度</div><div class="vl">水平 '+(HORACC[d.hor_acc]||d.hor_acc)+' · 垂直 '+(VERACC[d.ver_acc]||d.ver_acc)+' · 速度 '+(SPDACC[d.speed_acc]||d.speed_acc)+(d.baro_acc!==undefined&&d.baro_acc!==null?' · 气压 '+(VERACC[d.baro_acc]||d.baro_acc):'')+(d.ts_acc!==undefined&&d.ts_acc!==null?' · 时间 '+(d.ts_acc?(d.ts_acc/10)+'s':'未知'):'')+'</div></div>';else g2+=nbRow('定位精度',' fw');
+      if(d.op_loc_type!==undefined&&d.op_loc_type!==null)g2+='<div class="di"><div class="lb">飞手位置</div><div class="vl">'+(OPLOC[d.op_loc_type]||d.op_loc_type)+'</div></div>';else g2+=nbRow('飞手位置');
+      if(d.alt_baro!==undefined&&d.alt_baro>-999)g2+='<div class="di"><div class="lb">气压高度</div><div class="vl">'+d.alt_baro+' m</div></div>';else g2+=nbRow('气压高度');
+      if(d.op_alt_geo!==undefined&&d.op_alt_geo>-999)g2+='<div class="di"><div class="lb">操作员海拔</div><div class="vl">'+d.op_alt_geo+' m</div></div>';else g2+=nbRow('操作员海拔');
       var euc=(d.category_eu>0&&EUCATMAP[d.category_eu])?EUCATMAP[d.category_eu]:'';
       var eu=(d.class_eu>0&&EUCLASSMAP[d.class_eu])?EUCLASSMAP[d.class_eu]:'';
-      if(d.classification===1||eu||euc)g3+='<div class="di hw"><div class="lb">EU 分类</div><div class="vl">'+(euc?euc+' / ':'')+eu+'</div></div>';
-      if(d.auth_hex||d.auth_data)g3+='<div class="di fw"><div class="lb">认证数据</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+(d.auth_hex||d.auth_data)+'</div></div>';
-      if(d.area_count>0)g3+='<div class="di fw"><div class="lb">应急区域</div><div class="vl">'+d.area_count+' 个 · 半径 '+d.area_radius+'m · 上限 '+d.area_ceiling+'m · 下限 '+d.area_floor+'m</div></div>';
-      if(d.up_s!==undefined&&d.up_s>0)g4+='<div class="di"><div class="lb">开机时长</div><div class="vl">'+fmtDur(d.up_s)+'</div></div>';
-      if(d.pkts!==undefined)g4+='<div class="di"><div class="lb">数据包</div><div class="vl">'+d.pkts+'</div></div>';
-      if(d.bcast!==undefined&&d.bcast>0)g4+='<div class="di"><div class="lb">广播速率</div><div class="vl">'+d.bcast+' 帧/s</div></div>';
-      if(d.hist&&d.hist.length)g5+='<div class="di fw"><div class="lb">飞行轨迹 ('+d.hist.length+'点)</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+d.hist.map(function(p){return p.la.toFixed(6)+','+p.lo.toFixed(6)}).join(' ; ')+'</div></div>';
-      if(d.dji&&d.dji.length)for(var di=0;di<d.dji.length;di++)g5+='<div class="di fw"><div class="lb">DJI 私有消息 0x'+d.dji[di].t.toString(16).toUpperCase()+'</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+d.dji[di].h+'</div></div>';
-      if(d.nan_raw)g5+='<div class="di fw"><div class="lb">NAN 原始帧</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+d.nan_raw+'</div></div>';
+      if(d.classification===1||eu||euc)g3+='<div class="di hw"><div class="lb">EU 分类</div><div class="vl">'+(euc?euc+' / ':'')+eu+'</div></div>';else g3+=nbRow('EU 分类',' hw');
+      if(d.auth_hex||d.auth_data)g3+='<div class="di fw"><div class="lb">认证数据</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+(d.auth_hex||d.auth_data)+'</div></div>';else g3+=nbRow('认证数据',' fw');
+      if(d.area_count>0)g3+='<div class="di fw"><div class="lb">应急区域</div><div class="vl">'+d.area_count+' 个 · 半径 '+d.area_radius+'m · 上限 '+d.area_ceiling+'m · 下限 '+d.area_floor+'m</div></div>';else g3+=nbRow('应急区域',' fw');
+      if(d.up_s!==undefined&&d.up_s>0)g4+='<div class="di"><div class="lb">开机时长</div><div class="vl">'+fmtDur(d.up_s)+'</div></div>';else g4+=nbRow('开机时长');
+      if(d.pkts!==undefined)g4+='<div class="di"><div class="lb">数据包</div><div class="vl">'+d.pkts+'</div></div>';else g4+=nbRow('数据包');
+      if(d.bcast!==undefined&&d.bcast>0)g4+='<div class="di"><div class="lb">广播速率</div><div class="vl">'+d.bcast+' 帧/s</div></div>';else g4+=nbRow('广播速率');
+      if(d.hist&&d.hist.length)g5+='<div class="di fw"><div class="lb">飞行轨迹 ('+d.hist.length+'点)</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+d.hist.map(function(p){return p.la.toFixed(6)+','+p.lo.toFixed(6)}).join(' ; ')+'</div></div>';else g5+=nbRow('飞行轨迹',' fw');
+      if(d.dji&&d.dji.length)for(var di=0;di<d.dji.length;di++)g5+='<div class="di fw"><div class="lb">DJI 私有消息 0x'+d.dji[di].t.toString(16).toUpperCase()+'</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+d.dji[di].h+'</div></div>';else g5+=nbRow('DJI 私有消息',' fw');
+      if(d.nan_raw)g5+='<div class="di fw"><div class="lb">NAN 原始帧</div><div class="vl" style="white-space:normal;word-break:break-all;font-size:11px">'+d.nan_raw+'</div></div>';else g5+=nbRow('NAN 原始帧',' fw');
       if(g1)h+='<div class="grp">身份标识</div>'+g1;
       if(g2)h+='<div class="grp">位置与精度</div>'+g2;
       if(g3)h+='<div class="grp">系统与合规</div>'+g3;
@@ -576,6 +679,8 @@ DS.cmd('DRONES',4000).then(function(data){
     document.getElementById('dl').innerHTML=h;
   }
   document.getElementById('lu').textContent='更新: '+new Date().toLocaleTimeString('zh-CN');
+  try{if(mpOn)mpSync(ds);}catch(x){}
+  }catch(ex){if(window.console&&console.warn)console.warn('DRONES render error:',ex);}
 }).catch(function(){
   if(Date.now()<selPause)return;
   showOff();   // 失败立即反馈，不等 3 秒
@@ -587,17 +692,13 @@ var offTimer=null;
 var okN=0;
 function showOff(){
 okN=0;
-var b=document.getElementById('connlost');if(b)b.style.display='block';
 var bg=document.getElementById('bdg');
 if(bg){bg.textContent='未连接';bg.style.background='rgba(233,69,96,.15)';bg.style.color='#ff8a93';bg.style.borderColor='rgba(233,69,96,.4)';}
-var o=document.getElementById('ovl');if(o)o.className='on';
 document.getElementById('lu').textContent='未连接，请点击顶部「连接设备」';
 }
 function hideOff(){
-var b=document.getElementById('connlost');if(b)b.style.display='none';
 var bg=document.getElementById('bdg');
 if(bg){bg.textContent='扫描中';bg.style.background='';bg.style.color='';bg.style.borderColor='';}
-var o=document.getElementById('ovl');if(o)o.className='';
 }
 function clr(){DS.cmd('CLEAR').then(function(){load()}).catch(function(){})}
 function prune(){DS.cmd('PRUNE').then(function(){load()}).catch(function(){})}
@@ -696,6 +797,214 @@ window.doCal=doCal;window.resetCal=resetCal;window.closeCal=closeCal;window.onP0
   o.onclick=function(e){if(e.target===o)closeCal();};
   document.body.appendChild(o);
 })();
+
+/* ================= 地图视图 ================= */
+var MAPBTN_HTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>地图';
+var MAPBTN_ON_HTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>收起地图';
+var mp=null,mpOn=false,mpLoading=null,mpLayers={},mpPrevN=-1,mpUserMoved=false;
+function escMp(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+var mpTrail={};
+var BEEP=false;try{BEEP=localStorage.getItem('ridBeep')==='1';}catch(e){}
+var AC=null,lastBeep=0;
+function llDist(a,b){var r=Math.PI/180,R=6371000,dLa=(b[0]-a[0])*r,dLo=(b[1]-a[1])*r;var x=Math.pow(Math.sin(dLa/2),2)+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.pow(Math.sin(dLo/2),2);return 2*R*Math.asin(Math.sqrt(x));}
+function llFmt(m){return m<1000?Math.round(m)+' m':(m/1000).toFixed(2)+' km';}
+function ppTip(d,p2,ll,label){var h='<b>'+escMp(label||'未知机型')+'</b><br>飞手位置<br>'+p2[0].toFixed(6)+', '+p2[1].toFixed(6);if(ll)h+='<br>距无人机 约 '+llFmt(llDist(p2,ll));return h;}
+function playBeep(){
+  try{
+    if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(!C)return;AC=new C();}
+    if(AC.state==='suspended')AC.resume();
+    var t=AC.currentTime;
+    [880,1318].forEach(function(f,i){
+      var o=AC.createOscillator(),g=AC.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,t+i*0.18);
+      g.gain.exponentialRampToValueAtTime(0.22,t+i*0.18+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+i*0.18+0.16);
+      o.connect(g);g.connect(AC.destination);
+      o.start(t+i*0.18);o.stop(t+i*0.18+0.17);
+    });
+  }catch(e){}
+}
+var bpLastT=0;
+function toggleBeep(){
+  var tn=Date.now();if(tn-bpLastT<350)return;bpLastT=tn;
+  BEEP=!BEEP;
+  try{localStorage.setItem('ridBeep',BEEP?'1':'0');}catch(e){}
+  var b=document.getElementById('beepbtn');
+  if(b)b.textContent='提示音:'+(BEEP?'开':'关');
+  if(BEEP)playBeep();
+}
+window.toggleBeep=toggleBeep;
+(function(){var b=document.getElementById('beepbtn');if(b)b.textContent='提示音:'+(BEEP?'开':'关');})();
+function loadLeaflet(){
+  if(window.L)return Promise.resolve();
+  if(mpLoading)return mpLoading;
+  mpLoading=new Promise(function(res,rej){
+    var lk=document.createElement('link');
+    lk.rel='stylesheet';
+    lk.href='https://cdn.bootcdn.net/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+    lk.onerror=function(){lk.href='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css';};
+    document.head.appendChild(lk);
+    var s=document.createElement('script');
+    s.src='https://cdn.bootcdn.net/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    s.onload=function(){res();};
+    s.onerror=function(){
+      var s2=document.createElement('script');
+      s2.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js';
+      s2.onload=function(){res();};
+      s2.onerror=function(){mpLoading=null;rej(new Error('leaflet-load'));};
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(s);
+  });
+  return mpLoading;
+}
+function initMp(){
+  if(mp)return;
+  mp=L.map('mapel',{zoomControl:true});
+  var dark=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'});
+  var std=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'});
+  dark.addTo(mp);
+  L.control.layers({'深色底图':dark,'标准底图':std}).addTo(mp);
+  mp.on('dragstart',function(){mpUserMoved=true;});
+  setTimeout(function(){if(mp)mp.invalidateSize()},80);
+}
+function dIcon(col,label,stale){
+  var dot='<span style="position:absolute;left:50%;top:50%;width:11px;height:11px;margin:-5.5px;border-radius:50%;background:'+col+(stale?';opacity:.45':';box-shadow:0 0 8px '+col)+'"></span>';
+  var lb=label?'<b style="position:absolute;left:16px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.95)">'+escMp(label)+'</b>':'';
+  return L.divIcon({className:'',iconSize:[12,12],iconAnchor:[6,6],html:'<div style="position:relative;width:12px;height:12px">'+dot+lb+'</div>'});
+}
+function ppIcon(){
+  return L.divIcon({className:'',iconSize:[10,10],iconAnchor:[5,5],html:'<span style="display:block;width:9px;height:9px;border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></span>'});
+}
+function mpPop(d){
+  var noSig=(d.rssi===undefined||d.rssi===null||d.rssi===0);
+  var altV=(d.height_agl!==undefined&&d.height_agl>-999)?d.height_agl:((d.alt!==undefined&&d.alt>-999)?d.alt:null);
+  var dist=!noSig?rssiDist(d.rssi):0;
+  var h='<b>'+escMp(d.model_name||'未知机型')+'</b>'+(d.model_cat?' <span style="opacity:.55;font-size:10px">'+escMp(d.model_cat)+'</span>':'');
+  h+='<br>MAC '+escMp(d.mac||'-');
+  if(altV!==null)h+='<br>高度 '+altV+' m';
+  if(d.speed!==undefined&&d.speed!==null)h+='<br>速度 '+d.speed+' m/s';
+  if(d.heading!==undefined&&d.heading>=0&&d.heading<=360)h+='<br>航向 '+d.heading+'°';
+  h+='<br>信号 '+(noSig?'无':d.rssi+' dBm'+(dist?'（约 '+dist+' m）':''));
+  if(d.base_lat)h+='<br><span style="color:#C58AF9">■</span> 飞手位置已标注';
+  h+='<br>活跃 '+fmtAgo(d.last_seen)+(d.last_seen>5?'（失联）':'');
+  return h;
+}
+function mpSync(ds){
+  if(!mp)return;
+  var seen={},pts=[],n=0,i,j,k;
+  for(i=0;i<ds.length;i++){
+    var d=ds[i];
+    var hasD=d.lat&&d.lon&&isFinite(d.lat)&&isFinite(d.lon);
+    var hasP=d.base_lat&&d.base_lon&&isFinite(d.base_lat)&&isFinite(d.base_lon);
+    if(!hasD&&!hasP)continue;
+    var key=d.mac||('i'+i);
+    seen[key]=1;n++;
+    var stale=(d.last_seen>5),noSig=(d.rssi===undefined||d.rssi===null||d.rssi===0);
+    var col=stale?'#8a8a8a':(noSig?'#FCE100':rc(d.rssi));
+    var ll=hasD?[d.lat,d.lon]:null;
+    if(ll)pts.push(ll);
+    var label=d.model_name||(d.mac?('…'+String(d.mac).slice(-4)):('目标'+(i+1)));
+    var e=mpLayers[key];
+    if(!e){
+      var g=L.layerGroup().addTo(mp);
+      e=mpLayers[key]={g:g,m:null,pp:null,pl:null,tk:null,lastLL:null};
+    }
+    if(ll){
+      if(!e.m){
+        e.m=L.marker(ll,{icon:dIcon(col,label,stale)}).bindPopup(mpPop(d),{autoPan:false,maxWidth:250}).addTo(e.g);
+      }else{
+        e.m.setLatLng(ll);
+        e.m.setIcon(dIcon(col,label,stale));
+        e.m.setPopupContent(mpPop(d));
+      }
+      e.lastLL=ll;
+    }
+    if(hasP){
+      var p2=[d.base_lat,d.base_lon];
+      pts.push(p2);
+      var anchor=e.lastLL;
+      if(!e.pp){
+        e.pp=L.marker(p2,{icon:ppIcon()}).bindTooltip('',{direction:'top',offset:[0,-8],opacity:.95}).addTo(e.g);
+        e.pl=L.polyline(anchor?[p2,anchor]:[p2,p2],{color:'#ffffff',weight:1.4,opacity:.4,dashArray:'5 6',interactive:false}).addTo(e.g);
+        if(!anchor)e.pl.setStyle({opacity:0});
+      }else{
+        e.pp.setLatLng(p2);
+      }
+      e.pp.setTooltipContent(ppTip(d,p2,anchor,label));
+      if(anchor){e.pl.setLatLngs([p2,anchor]);e.pl.setStyle({opacity:stale?.18:.4});}
+      else e.pl.setStyle({opacity:0});
+      e.pp.setOpacity(stale?.4:1);
+    }else if(e.pp){e.g.removeLayer(e.pp);e.g.removeLayer(e.pl);e.pp=e.pl=null;}
+    if(ll){
+      var tr=mpTrail[key];
+      if(!tr)tr=mpTrail[key]=[];
+      var ht=d.hist;
+      if(!tr.length&&ht&&ht.length){
+        for(j=0;j<ht.length;j++){var hp=ht[j];if(hp&&isFinite(hp.la)&&isFinite(hp.lo)){var lp=[hp.la,hp.lo],lq=tr[tr.length-1];if(!lq||Math.abs(lp[0]-lq[0])>1e-6||Math.abs(lp[1]-lq[1])>1e-6)tr.push(lp);}}
+      }
+      var lq2=tr[tr.length-1];
+      if(!lq2||Math.abs(ll[0]-lq2[0])>1e-5||Math.abs(ll[1]-lq2[1])>1e-5){tr.push([ll[0],ll[1]]);if(tr.length>800)tr.shift();}
+      if(tr.length>1){
+        if(!e.tk)e.tk=L.polyline(tr,{color:'#4CC2FF',weight:2,opacity:.8,interactive:false}).addTo(e.g);
+        else e.tk.setLatLngs(tr);
+      }else if(e.tk){e.g.removeLayer(e.tk);e.tk=null;}
+    }
+  }
+  for(k in mpLayers){
+    if(!seen[k]){try{mp.removeLayer(mpLayers[k].g);}catch(x){}delete mpLayers[k];delete mpTrail[k];}
+  }
+  if(n&&pts.length&&!mpUserMoved&&(mpPrevN<0||n>mpPrevN)){
+    try{mp.fitBounds(L.latLngBounds(pts),{padding:[34,34],maxZoom:17});}catch(x){}
+  }
+  mpPrevN=n;
+}
+function mpFitAll(){
+  if(!mp)return;
+  mpUserMoved=false;
+  var pts=[];
+  for(var k in mpLayers){
+    var e=mpLayers[k];
+    try{if(e.m)pts.push(e.m.getLatLng());}catch(x){}
+    try{if(e.pp)pts.push(e.pp.getLatLng());}catch(x){}
+  }
+  if(pts.length){try{mp.fitBounds(L.latLngBounds(pts),{padding:[34,34],maxZoom:17});}catch(x){}}
+}
+var mpLastT=0;
+function toggleMap(){
+  var now=Date.now();
+  if(now-mpLastT<350)return;
+  mpLastT=now;
+  var box=document.getElementById('mapbox'),btn=document.getElementById('mapbtn');
+  if(!box||!btn)return;
+  mpOn=!mpOn;
+  if(mpOn){
+    box.classList.add('on');
+    btn.classList.add('on');
+    btn.innerHTML=MAPBTN_ON_HTML;
+    loadLeaflet().then(function(){
+      initMp();
+      setTimeout(function(){if(mp)mp.invalidateSize()},60);
+      mpPrevN=-1;
+      mpSync(lastData);
+    }).catch(function(){
+      mpOn=false;
+      box.classList.remove('on');
+      btn.classList.remove('on');
+      btn.innerHTML=MAPBTN_HTML;
+      var ph=document.getElementById('prevhint');
+      if(ph){ph.style.display='block';ph.textContent='地图组件加载失败，请检查网络连接后重试';}
+    });
+  }else{
+    box.classList.remove('on');
+    btn.classList.remove('on');
+    btn.innerHTML=MAPBTN_HTML;
+  }
+}
+window.toggleMap=toggleMap;
+window.mpFitAll=mpFitAll;
+
 })();
 </script>
 

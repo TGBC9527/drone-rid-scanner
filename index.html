@@ -204,7 +204,10 @@ svg.i .fd{fill:currentColor;stroke:none}
 @media(hover:hover){#p-scan .item:hover{transform:translateY(-1px);background:rgba(255,255,255,.24)}}
 #mapbtn.on{background:rgba(76,194,255,.22);color:#4CC2FF}
 #mapbox{display:none;position:relative;margin:0 16px 6px;height:min(66vh,600px);border:1px solid rgba(255,255,255,.16);border-radius:8px;overflow:hidden;background:#07070c}
-#mapbox.on{display:block}
+#mapbox.on{display:block;transform-origin:top center;animation:mpExpand .38s cubic-bezier(.22,.9,.36,1)}
+@keyframes mpExpand{from{opacity:0;transform:scaleY(.9)}to{opacity:1;transform:scaleY(1)}}
+#mapbox.closing{transform-origin:top center;animation:mpCollapse .28s ease forwards;pointer-events:none}
+@keyframes mpCollapse{to{opacity:0;transform:scaleY(.9)}}
 #mapel{position:absolute;inset:0}
 #mplegend{background:rgba(7,7,12,.82);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:7px 10px;font-size:11px;line-height:1.9;color:rgba(255,255,255,.79);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 #mplegend b{display:flex;align-items:center;color:#fff;font-size:10px;letter-spacing:2px;margin:-2px -4px 4px;padding:3px 4px;border-radius:4px;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
@@ -215,6 +218,10 @@ svg.i .fd{fill:currentColor;stroke:none}
 #mplegend div{display:flex;align-items:center}
 #mplegend i{display:inline-block;width:9px;height:9px;margin-right:6px;flex-shrink:0;border-radius:50%}
 #mpctl{position:absolute;left:8px;bottom:8px;z-index:1000;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.mp-locbtn{position:absolute;right:8px;bottom:8px;z-index:1000;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:6px;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);padding:0}
+.mp-locbtn svg{width:20px;height:20px}
+.mp-locbtn.on{color:#4CC2FF;border-color:rgba(76,194,255,.55);background:rgba(76,194,255,.14)}
+.mp-locbtn.wait{opacity:.65}
 #mpfit{background:rgba(7,7,12,.85);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 #mpfit:active{transform:scale(.97)}
 #mpsc .leaflet-control-scale{margin:0}
@@ -229,7 +236,15 @@ svg.i .fd{fill:currentColor;stroke:none}
 .leaflet-bar a,.leaflet-bar a:hover{background:#15151c!important;color:#fff!important;border-bottom-color:rgba(255,255,255,.18)!important}
 .leaflet-control-layers{border:1px solid rgba(255,255,255,.2)!important;border-radius:8px!important;overflow:hidden}
 .leaflet-control-layers-toggle{background-color:#15151c}
-@media(max-width:899px){#mapbox{margin:0 8px 4px;height:58vh}}
+.dwrap{position:relative;width:12px;height:12px}
+.dwrap.ping::before{content:'';position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;border:2px solid #4CC2FF;animation:pingRing 1.8s ease-out 3}
+@keyframes pingRing{0%{transform:scale(.6);opacity:.9}100%{transform:scale(3.4);opacity:0}}
+.leaflet-popup-content-wrapper{transform-origin:50% 100%;animation:popIn .28s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{opacity:0;transform:translateY(10px) scale(.7)}to{opacity:1;transform:none}}
+.leaflet-tooltip{animation:fadeIn .22s ease}
+.osm-dark{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.75)}
+.lbl-halo{filter:drop-shadow(0 0 1px #000) drop-shadow(0 0 2px rgba(0,0,0,.9))}
+@media(max-width:899px){#mapbox{margin:0 8px 4px;height:58vh}#p-scan .ctrls{gap:6px;padding:0 10px 8px}}
 @media(min-width:900px){#mapbox{height:min(52vh,540px)}}
 #wrap{position:relative}
 #ovl{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.82);border-radius:8px;text-align:center;padding:24px;z-index:5;pointer-events:none}
@@ -326,7 +341,7 @@ svg.i .fd{fill:currentColor;stroke:none}
   <button class="btn btn2" id="mapbtn" onclick="toggleMap()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>地图</button>
   <button class="btn btn2" id="beepbtn" onclick="toggleBeep()" title="侦测到新目标时播放两声提示音">提示音:关</button>
 </div>
-<div id="wrap"><div id="mapbox"><div id="mapel"></div><div id="mpctl"><button id="mpfit" onclick="mpFitAll()">适应范围</button><div id="mpsc"></div><div id="mplegend"><b onclick="this.parentNode.classList.toggle('min')">图例<span class="lg-arw">▾</span></b><div id="mplg"><div><i style="background:#6CCB5F"></i>信号强（&gt;-70dBm）</div><div><i style="background:#FCE100"></i>信号弱 / 无RSSI</div><div><i style="background:#FF99A4"></i>信号很差</div><div><i style="background:#8a8a8a;opacity:.55"></i>失联 &gt; 5秒</div><div><i style="border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></i>飞手位置</div><div><i style="height:0;width:12px;border-radius:0;border-top:2px solid #4CC2FF"></i>飞行轨迹</div></div></div></div><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
+<div id="wrap"><div id="mapbox"><div id="mapel"></div><button id="locbtn" class="mp-locbtn" onclick="locateMe()" title="把地图中心移动到我的位置"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></g></svg></button><div id="mpctl"><button id="mpfit" onclick="mpFitAll()">适应范围</button><div id="mpsc"></div><div id="mplegend"><b onclick="this.parentNode.classList.toggle('min')">图例<span class="lg-arw">▾</span></b><div id="mplg"><div><i style="background:#6CCB5F"></i>信号强（&gt;-70dBm）</div><div><i style="background:#FCE100"></i>信号弱 / 无RSSI</div><div><i style="background:#FF99A4"></i>信号很差</div><div><i style="background:#8a8a8a;opacity:.55"></i>失联 &gt; 5秒</div><div><i style="border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></i>飞手位置</div><div><i style="height:0;width:12px;border-radius:0;border-top:2px solid #4CC2FF"></i>飞行轨迹</div></div></div></div><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
 <div class="lu" id="lu">--</div>
 </section>
 
@@ -845,6 +860,95 @@ function toggleBeep(){
 }
 window.toggleBeep=toggleBeep;
 (function(){var b=document.getElementById('beepbtn');if(b)b.textContent='提示音:'+(BEEP?'开':'关');})();
+var userWatch=null,userLL=null,userDot=null,userAcc=null,pendCenter=false;
+function userIcon(){return L.divIcon({className:'',iconSize:[20,20],iconAnchor:[10,10],html:'<span style="display:block;width:14px;height:14px;margin:3px;border-radius:50%;background:#0D47A1;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.55)"></span>'});}
+function userUpdate(pos){
+  var la=pos.coords.latitude,lo=pos.coords.longitude;
+  if(!isFinite(la)||!isFinite(lo))return;
+  userLL=[la,lo];
+  if(!mp)return;
+  if(!userDot)userDot=L.marker(userLL,{icon:userIcon(),interactive:false,zIndexOffset:1000}).addTo(mp);
+  else userDot.setLatLng(userLL);
+  var acc=pos.coords.accuracy||0;
+  if(acc>10){
+    if(!userAcc)userAcc=L.circle(userLL,{radius:acc,color:'#1565C0',weight:3.5,opacity:.8,fill:true,fillColor:'#0D47A1',fillOpacity:.12,interactive:false}).addTo(mp);
+    else{userAcc.setLatLng(userLL);userAcc.setRadius(acc);}
+  }else if(userAcc){mp.removeLayer(userAcc);userAcc=null;}
+}
+function userStop(){
+  if(userWatch!==null){navigator.geolocation.clearWatch(userWatch);userWatch=null;}
+  if(userDot&&mp){mp.removeLayer(userDot);userDot=null;}
+  if(userAcc&&mp){mp.removeLayer(userAcc);userAcc=null;}
+  userLL=null;userCentered=false;
+}
+function locateMe(){
+  var b=document.getElementById('locbtn');
+  if(!navigator.geolocation){
+    var ph0=document.getElementById('prevhint');
+    if(ph0){ph0.style.display='block';ph0.textContent='此环境不支持定位（需 HTTPS / localhost / 本地文件方式打开）';}
+    return;
+  }
+  if(userWatch===null){
+    if(b)b.className='mp-locbtn wait';
+    userWatch=navigator.geolocation.watchPosition(function(pos){
+      userUpdate(pos);
+      var bb=document.getElementById('locbtn');
+      if(bb)bb.className='mp-locbtn on';
+      if(pendCenter&&mp&&userLL){mp.flyTo(userLL,Math.max(mp.getZoom(),15),{duration:.9});pendCenter=false;}
+    },function(err){
+      userStop();
+      var bb=document.getElementById('locbtn');
+      if(bb)bb.className='mp-locbtn';
+      var ph=document.getElementById('prevhint');
+      if(ph){ph.style.display='block';ph.textContent='定位失败：'+(err.code===1?'未授权':(err.code===3?'超时':'不可用'))+'（手机浏览器需 HTTPS）';}
+    },{enableHighAccuracy:true,maximumAge:2000,timeout:15000});
+  }
+  if(mp&&userLL){mp.flyTo(userLL,Math.max(mp.getZoom(),16),{duration:.9});pendCenter=false;}
+  else pendCenter=true;
+}
+window.locateMe=locateMe;
+try{if(localStorage.getItem('ridMapOn')==='1')setTimeout(toggleMap,0);}catch(e){}
+var ANIM_MS=900,animRaf=0;
+function mpKick(){if(!animRaf)animRaf=requestAnimationFrame(animTick);}
+function tkFinish(e){if(!e.tka)return;if(e.trRef)e.tk.setLatLngs(e.trRef.map(function(p){return [p[0],p[1]];}));e.tka=null;}
+function mpMarkAnim(key,to){
+  var e=mpLayers[key];if(!e||!e.m)return false;
+  var from=e.cur||e.lastLL;if(!from)return false;
+  if(Math.abs(from[0]-to[0])<1e-7&&Math.abs(from[1]-to[1])<1e-7)return false;
+  if(e.tka)tkFinish(e);
+  e.anim={f:[from[0],from[1]],t:[to[0],to[1]],s:performance.now()};
+  mpKick();return true;
+}
+function animTick(now){
+  animRaf=0;var more=false;
+  for(var k in mpLayers){
+    var e=mpLayers[k];
+    if(e.anim&&e.cur){
+      var a=e.anim,p=Math.min(1,(now-a.s)/ANIM_MS),cur;
+      if(p>=1)cur=a.t;else{var q=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;cur=[a.f[0]+(a.t[0]-a.f[0])*q,a.f[1]+(a.t[1]-a.f[1])*q];more=true;}
+      e.cur=cur;delete e.anim;
+      if(e.m)e.m.setLatLng(cur);
+      if(e.pp&&e.pl)e.pl.setLatLngs([e.pp.getLatLng(),cur]);
+    }
+    if(e.tka){
+      var g=e.tka,q2=Math.min(1,(now-g.s)/ANIM_MS),pt;
+      if(q2>=1){pt=g.t;}else{var w=q2<.5?2*q2*q2:1-Math.pow(-2*q2+2,2)/2;pt=[g.f[0]+(g.t[0]-g.f[0])*w,g.f[1]+(g.t[1]-g.f[1])*w];more=true;}
+      e.tk.setLatLngs(g.pre.concat([pt]));
+      if(q2>=1)e.tka=null;
+    }
+  }
+  for(k in mpLayers){if(mpLayers[k].anim||mpLayers[k].tka){more=true;break;}}
+  if(more)animRaf=requestAnimationFrame(animTick);
+}
+function tkStart(e,tr){
+  if(tr.length<2)return false;
+  if(e.tka)tkFinish(e);
+  e.trRef=tr;
+  if(!e.tk)e.tk=L.polyline(tr,{color:'#4CC2FF',weight:2,opacity:.8,interactive:false}).addTo(e.g);
+  e.tka={pre:tr.slice(0,tr.length-1),f:tr[tr.length-2],t:tr[tr.length-1],s:performance.now()};
+  e.tk.setLatLngs(e.tka.pre.concat([e.tka.f]));
+  mpKick();return true;
+}
 function loadLeaflet(){
   if(window.L)return Promise.resolve();
   if(mpLoading)return mpLoading;
@@ -874,26 +978,29 @@ function initMp(){
   var dark=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'});
   var std=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'});
   var sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,maxNativeZoom:18,attribution:'Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics'});
-  var dk2=L.layerGroup([
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,maxNativeZoom:16,attribution:'&copy; Esri'}),
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,maxNativeZoom:16})
-  ]);
+  var dko=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,className:'osm-dark',attribution:'&copy; OpenStreetMap'});
   var hyb=L.layerGroup([
     sat,
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',opacity:.9})
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,maxNativeZoom:16}),
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',className:'lbl-halo'})
   ]);
+  var BASES={'深色底图':dark,'深色全要素':dko,'标准底图':std,'卫星影像':sat,'卫星标注':hyb};
   dark.addTo(mp);
-  L.control.layers({'深色底图':dark,'深色详细':dk2,'标准底图':std,'卫星影像':sat,'卫星·标注':hyb}).addTo(mp);
+  L.control.layers(BASES).addTo(mp);
   L.control.scale({imperial:false,maxWidth:120}).addTo(mp);
   var mh=document.getElementById('mpsc'),msc=document.querySelector('.leaflet-control-scale');
   if(mh&&msc)mh.appendChild(msc);
+  var savedBase=null;try{savedBase=localStorage.getItem('ridBase');}catch(e){}
+  if(savedBase==='卫星·标注')savedBase='卫星标注';
+  if(savedBase&&BASES[savedBase]&&savedBase!=='深色底图'){mp.removeLayer(dark);BASES[savedBase].addTo(mp);}
+  mp.on('baselayerchange',function(ev){try{localStorage.setItem('ridBase',ev.name);}catch(e){}});
   mp.on('dragstart',function(){mpUserMoved=true;});
   setTimeout(function(){if(mp)mp.invalidateSize()},80);
 }
-function dIcon(col,label,stale){
+function dIcon(col,label,stale,ping){
   var dot='<span style="position:absolute;left:50%;top:50%;width:11px;height:11px;margin:-5.5px;border-radius:50%;background:'+col+(stale?';opacity:.45':';box-shadow:0 0 8px '+col)+'"></span>';
   var lb=label?'<b style="position:absolute;left:16px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.95)">'+escMp(label)+'</b>':'';
-  return L.divIcon({className:'',iconSize:[12,12],iconAnchor:[6,6],html:'<div style="position:relative;width:12px;height:12px">'+dot+lb+'</div>'});
+  return L.divIcon({className:'',iconSize:[12,12],iconAnchor:[6,6],html:'<div class="dwrap'+(ping?' ping':'')+'" style="position:relative;width:12px;height:12px">'+dot+lb+'</div>'});
 }
 function ppIcon(){
   return L.divIcon({className:'',iconSize:[10,10],iconAnchor:[5,5],html:'<span style="display:block;width:9px;height:9px;border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></span>'});
@@ -934,27 +1041,30 @@ function mpSync(ds){
     }
     if(ll){
       if(!e.m){
-        e.m=L.marker(ll,{icon:dIcon(col,label,stale)}).bindPopup(mpPop(d),{autoPan:false,maxWidth:250}).addTo(e.g);
+        e.m=L.marker(ll,{icon:dIcon(col,label,stale,!stale)}).bindPopup(mpPop(d),{autoPan:false,maxWidth:250}).addTo(e.g);
+        e.cur=[ll[0],ll[1]];
       }else{
-        e.m.setLatLng(ll);
-        e.m.setIcon(dIcon(col,label,stale));
+        e.m.setIcon(dIcon(col,label,stale,false));
         e.m.setPopupContent(mpPop(d));
+        if(!stale)mpMarkAnim(key,ll);
       }
+      if(stale||!e.anim)e.cur=[ll[0],ll[1]];
       e.lastLL=ll;
     }
     if(hasP){
       var p2=[d.base_lat,d.base_lon];
       pts.push(p2);
       var anchor=e.lastLL;
+      var vis=(e.m&&e.cur)?e.cur:anchor;
       if(!e.pp){
         e.pp=L.marker(p2,{icon:ppIcon()}).bindTooltip('',{direction:'top',offset:[0,-8],opacity:.95}).addTo(e.g);
-        e.pl=L.polyline(anchor?[p2,anchor]:[p2,p2],{color:'#ffffff',weight:1.4,opacity:.4,dashArray:'5 6',interactive:false}).addTo(e.g);
-        if(!anchor)e.pl.setStyle({opacity:0});
+        e.pl=L.polyline(vis?[p2,vis]:[p2,p2],{color:'#ffffff',weight:1.4,opacity:.4,dashArray:'5 6',interactive:false}).addTo(e.g);
+        if(!vis)e.pl.setStyle({opacity:0});
       }else{
         e.pp.setLatLng(p2);
       }
-      e.pp.setTooltipContent(ppTip(d,p2,anchor,label));
-      if(anchor){e.pl.setLatLngs([p2,anchor]);e.pl.setStyle({opacity:stale?.18:.4});}
+      e.pp.setTooltipContent(ppTip(d,p2,vis,label));
+      if(vis){e.pl.setLatLngs([p2,vis]);e.pl.setStyle({opacity:stale?.18:.4});}
       else e.pl.setStyle({opacity:0});
       e.pp.setOpacity(stale?.4:1);
     }else if(e.pp){e.g.removeLayer(e.pp);e.g.removeLayer(e.pl);e.pp=e.pl=null;}
@@ -966,18 +1076,30 @@ function mpSync(ds){
         for(j=0;j<ht.length;j++){var hp=ht[j];if(hp&&isFinite(hp.la)&&isFinite(hp.lo)){var lp=[hp.la,hp.lo],lq=tr[tr.length-1];if(!lq||Math.abs(lp[0]-lq[0])>1e-6||Math.abs(lp[1]-lq[1])>1e-6)tr.push(lp);}}
       }
       var lq2=tr[tr.length-1];
-      if(!lq2||Math.abs(ll[0]-lq2[0])>1e-5||Math.abs(ll[1]-lq2[1])>1e-5){tr.push([ll[0],ll[1]]);if(tr.length>800)tr.shift();}
-      if(tr.length>1){
-        if(!e.tk)e.tk=L.polyline(tr,{color:'#4CC2FF',weight:2,opacity:.8,interactive:false}).addTo(e.g);
-        else e.tk.setLatLngs(tr);
-      }else if(e.tk){e.g.removeLayer(e.tk);e.tk=null;}
+      var moved=!lq2||Math.abs(ll[0]-lq2[0])>1e-5||Math.abs(ll[1]-lq2[1])>1e-5;
+      if(moved){tr.push([ll[0],ll[1]]);if(tr.length>800)tr.shift();}
+      var needTk=tr.length>1&&!stale;
+      if(!needTk&&e.tk){e.g.removeLayer(e.tk);e.tk=null;e.tka=null;}
+      if(needTk){
+        if(moved){tkStart(e,tr);}
+        else if(!e.tk){e.tk=L.polyline(tr,{color:'#4CC2FF',weight:2,opacity:.8,interactive:false}).addTo(e.g);}
+      }
     }
   }
   for(k in mpLayers){
     if(!seen[k]){try{mp.removeLayer(mpLayers[k].g);}catch(x){}delete mpLayers[k];delete mpTrail[k];}
   }
-  if(n&&pts.length&&!mpUserMoved&&(mpPrevN<0||n>mpPrevN)){
-    try{mp.fitBounds(L.latLngBounds(pts),{padding:[34,34],maxZoom:17});}catch(x){}
+  if(n&&pts.length&&!mpUserMoved){
+    var focus=null;
+    if(mpPrevN<=0){
+      for(var fi=0;fi<ds.length;fi++){
+        var fd=ds[fi];
+        if(fd.lat&&fd.lon&&isFinite(fd.lat)&&isFinite(fd.lon)){focus=[fd.lat,fd.lon];break;}
+        if(!focus&&fd.base_lat&&fd.base_lon&&isFinite(fd.base_lat)&&isFinite(fd.base_lon))focus=[fd.base_lat,fd.base_lon];
+      }
+    }
+    if(focus){try{mp.flyTo(focus,16,{duration:.9});}catch(x){}}
+    else{try{mp.flyToBounds(L.latLngBounds(pts),{padding:[34,34],maxZoom:17,duration:.9});}catch(x){}}
   }
   mpPrevN=n;
 }
@@ -990,7 +1112,7 @@ function mpFitAll(){
     try{if(e.m)pts.push(e.m.getLatLng());}catch(x){}
     try{if(e.pp)pts.push(e.pp.getLatLng());}catch(x){}
   }
-  if(pts.length){try{mp.fitBounds(L.latLngBounds(pts),{padding:[34,34],maxZoom:17});}catch(x){}}
+  if(pts.length){try{mp.flyToBounds(L.latLngBounds(pts),{padding:[34,34],maxZoom:17,duration:.9});}catch(x){}}
 }
 var mpLastT=0;
 function toggleMap(){
@@ -1000,6 +1122,7 @@ function toggleMap(){
   var box=document.getElementById('mapbox'),btn=document.getElementById('mapbtn');
   if(!box||!btn)return;
   mpOn=!mpOn;
+  try{localStorage.setItem('ridMapOn',mpOn?'1':'0');}catch(e){}
   if(mpOn){
     box.classList.add('on');
     btn.classList.add('on');
@@ -1007,7 +1130,9 @@ function toggleMap(){
     loadLeaflet().then(function(){
       initMp();
       setTimeout(function(){if(mp)mp.invalidateSize()},60);
-      mpPrevN=-1;
+      if(userLL&&mp){mp.flyTo(userLL,Math.max(mp.getZoom(),15),{duration:.7});if(mpPrevN<0)mpPrevN=0;}
+      else pendCenter=true;
+      if(userWatch===null&&navigator.geolocation)locateMe();
       mpSync(lastData);
     }).catch(function(){
       mpOn=false;
@@ -1018,9 +1143,14 @@ function toggleMap(){
       if(ph){ph.style.display='block';ph.textContent='地图组件加载失败，请检查网络连接后重试';}
     });
   }else{
-    box.classList.remove('on');
+    box.classList.add('closing');
+    btn.disabled=true;
     btn.classList.remove('on');
     btn.innerHTML=MAPBTN_HTML;
+    setTimeout(function(){
+      box.classList.remove('on','closing');
+      if(btn)btn.disabled=false;
+    },280);
   }
 }
 window.toggleMap=toggleMap;

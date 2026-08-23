@@ -118,7 +118,8 @@ svg.i .fd{fill:currentColor;stroke:none}
 #p-home .card{padding:20px 18px}
 }
 @media(hover:hover){#p-home .card:hover{transform:translateY(-3px);border-color:rgba(76,194,255,.55);box-shadow:0 8px 24px rgba(0,0,0,.45)}#p-home .card:hover .ar{transform:translateX(4px)}#p-home .card:hover .ci{transform:translateY(-2px) scale(1.07)}}
-#p-scan .ctrls{padding:0 16px 10px;display:flex;gap:8px}
+#p-scan .ctrls{padding:0 16px 10px;display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#p-scan .ctrls::-webkit-scrollbar{display:none}
 #p-scan .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#4CC2FF;color:#000;border:none;border-bottom:2px solid rgba(0,0,0,.4);padding:10px 18px;border-radius:4px;cursor:pointer;font-size:13px;font-weight:500;flex-shrink:0;transition:filter .15s ease,transform .12s ease;font-family:inherit}
 #p-scan .btn svg{width:15px;height:15px}
 #p-scan .btn2{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:rgba(255,255,255,.18);color:rgba(255,255,255,.79);transition:background .15s ease}
@@ -205,12 +206,20 @@ svg.i .fd{fill:currentColor;stroke:none}
 #mapbox{display:none;position:relative;margin:0 16px 6px;height:min(66vh,600px);border:1px solid rgba(255,255,255,.16);border-radius:8px;overflow:hidden;background:#07070c}
 #mapbox.on{display:block}
 #mapel{position:absolute;inset:0}
-#mplegend{position:absolute;left:8px;bottom:8px;z-index:1000;background:rgba(7,7,12,.82);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:7px 10px;font-size:11px;line-height:1.9;color:rgba(255,255,255,.79);pointer-events:none;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
-#mplegend b{display:block;color:#fff;font-size:10px;letter-spacing:2px;margin-bottom:2px}
+#mplegend{background:rgba(7,7,12,.82);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:7px 10px;font-size:11px;line-height:1.9;color:rgba(255,255,255,.79);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#mplegend b{display:flex;align-items:center;color:#fff;font-size:10px;letter-spacing:2px;margin:-2px -4px 4px;padding:3px 4px;border-radius:4px;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#mplegend b:hover{background:rgba(255,255,255,.08)}
+#mplegend .lg-arw{margin-left:auto;font-size:9px;color:rgba(255,255,255,.55);transition:transform .2s}
+#mplegend.min .lg-arw{transform:rotate(-90deg)}
+#mplegend.min #mplg{display:none}
 #mplegend div{display:flex;align-items:center}
 #mplegend i{display:inline-block;width:9px;height:9px;margin-right:6px;flex-shrink:0;border-radius:50%}
-#mpfit{position:absolute;right:8px;bottom:8px;z-index:1000;background:rgba(7,7,12,.85);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#mpctl{position:absolute;left:8px;bottom:8px;z-index:1000;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+#mpfit{background:rgba(7,7,12,.85);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 #mpfit:active{transform:scale(.97)}
+#mpsc .leaflet-control-scale{margin:0}
+#mpsc .leaflet-control-scale-line{background:rgba(7,7,12,.82);border:1px solid rgba(255,255,255,.3);border-top:none;color:rgba(255,255,255,.79);font-size:10px;line-height:1.4;padding:1px 5px}
+#mplegend{position:relative;background:rgba(7,7,12,.82);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:7px 10px;font-size:11px;line-height:1.9;color:rgba(255,255,255,.79);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .leaflet-container{background:#07070c;font-family:inherit}
 .leaflet-control-attribution{background:rgba(7,7,12,.72)!important;color:rgba(255,255,255,.45)!important;font-size:9px!important}
 .leaflet-control-attribution a{color:#4CC2FF!important}
@@ -317,7 +326,7 @@ svg.i .fd{fill:currentColor;stroke:none}
   <button class="btn btn2" id="mapbtn" onclick="toggleMap()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>地图</button>
   <button class="btn btn2" id="beepbtn" onclick="toggleBeep()" title="侦测到新目标时播放两声提示音">提示音:关</button>
 </div>
-<div id="wrap"><div id="mapbox"><div id="mapel"></div><div id="mplegend"><b>图例</b><div><i style="background:#6CCB5F"></i>信号强（&gt;-70dBm）</div><div><i style="background:#FCE100"></i>信号弱 / 无RSSI</div><div><i style="background:#FF99A4"></i>信号很差</div><div><i style="background:#8a8a8a;opacity:.55"></i>失联 &gt; 5秒</div><div><i style="border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></i>飞手位置</div><div><i style="height:0;width:12px;border-radius:0;border-top:2px solid #4CC2FF"></i>飞行轨迹</div></div><button id="mpfit" onclick="mpFitAll()">适应范围</button></div><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
+<div id="wrap"><div id="mapbox"><div id="mapel"></div><div id="mpctl"><button id="mpfit" onclick="mpFitAll()">适应范围</button><div id="mpsc"></div><div id="mplegend"><b onclick="this.parentNode.classList.toggle('min')">图例<span class="lg-arw">▾</span></b><div id="mplg"><div><i style="background:#6CCB5F"></i>信号强（&gt;-70dBm）</div><div><i style="background:#FCE100"></i>信号弱 / 无RSSI</div><div><i style="background:#FF99A4"></i>信号很差</div><div><i style="background:#8a8a8a;opacity:.55"></i>失联 &gt; 5秒</div><div><i style="border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></i>飞手位置</div><div><i style="height:0;width:12px;border-radius:0;border-top:2px solid #4CC2FF"></i>飞行轨迹</div></div></div></div><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
 <div class="lu" id="lu">--</div>
 </section>
 
@@ -477,9 +486,9 @@ var UAV_MODELS=[
 ['1581F45Q','Mavic 3','消费级'],['1581F45T','Mavic 3','消费级'],['1581F895','Air 3S','消费级'],
 ['1581F6N8','Air 3','消费级'],['1581F385','Air 2S','消费级'],['1581F3YT','Air 2S','消费级'],
 ['1581FANL','Mini 5 Pro','消费级'],['1581F9DE','Mini 5 Pro','消费级'],['1581F5QJ','Mini 4 Pro','消费级'],
-['1581F6Z9','Mini 4 Pro','消费级'],['1581F8C8','Mini 4K','消费级'],['1581F8PJ','Mini 4K','消费级'],
+['1581F6Z9','Mini 4 Pro','消费级'],['1581F8C8','Mini 4K','消费级'],['1581F986','Mavic 4 Pro 512GB','消费级'],['1581F8PJ','Mini 4K','消费级'],
 ['1581F4XF','Mini 3 Pro','消费级'],['1581F5YH','Mini 3','消费级'],['1581F6CD','Mini 2 SE','消费级'],
-['1581FA8J','Avata 360','消费级'],['1581FBLK','Avata 360','消费级'],['1581FBV5','Lito 1','消费级'],
+['1581FA8J','Avata 360','消费级'],['1581FBLK','Avata 360 (DVN3NT)','消费级'],['1581FBV5','Lito 1','消费级'],
 ['1581F67P','Mavic 3 Classic','消费级'],['1581F6MK','Mavic 3 Pro Cine','消费级'],
 ['1581F0M6','Mavic 2 Zoom','消费级'],['1581F163','Mavic 2 Pro','消费级'],['1581F11V','Phantom 4 Pro V2.0','消费级'],
 ['1581F1WN','Mavic Air 2','消费级'],['1581F3N3','Mavic Air 2','消费级'],['1778S000','SplashDrone 4','消费级'],
@@ -490,19 +499,19 @@ var UAV_MODELS=[
 ['YUNQ4KPUS','Q500 4K Typhoon','消费级'],['P208904','Skydio 2/2+','消费级'],
 ['1581F87L','Neo','穿越机'],['1581F6W8','Avata 2','穿越机'],['1581F4CQ','Avata','穿越机'],
 ['1581F4QW','Avata','穿越机'],['1581FA6Q','Neo 2','穿越机'],['1581F8A1','Neo','穿越机'],
-['1581F3CQ','DJI FPV','穿越机'],['1581F37Q','FPV','穿越机'],['1581F7V2','DJI Flip','穿越机'],
+['1581F3CQ','DJI FPV','穿越机'],['15813NZC','DJI FPV','穿越机'],['1581F37Q','FPV','穿越机'],['1581F7V2','DJI Flip','穿越机'],
 ['1581F6H8','Matrice 350 RTK','行业级'],['1581F6GK','M350 RTK','行业级'],['1581F5BK','Matrice 30','行业级'],
 ['1581F4BN','M30','行业级'],['1581F62H','M30T','行业级'],['1581F5BL','M30 Dock version','行业级'],
 ['1581F5BM','M30T Dock version','行业级'],['1581F52Q','Mavic 3E/3T','行业级'],['1581F578','Inspire 3','行业级'],
 ['1581F4Z4','Inspire 3','行业级'],['1581F4GC','Mavic 2 Enterprise Advanced','行业级'],['1581F1ZN','M300 RTK','行业级'],
-['1581F0UY','Phantom 4 RTK','行业级'],['1581F5FJ','M3T','行业级'],['1581F5FH','M3E','行业级'],
+['1581F0UY','Phantom 4 RTK','行业级'],['1581F5FJ','M3T','行业级'],['1581F56N','M3T','行业级'],['1581F5FH','M3E','行业级'],
 ['1581F5FK','M3M','行业级'],['1581FBEX','M3TA','行业级'],['1581F6QA','M3D','行业级'],
 ['1581F6Q8','M3TD','行业级'],['1581F7FV','Matrice 4E','行业级'],['1581F7K3','Matrice 4T','行业级'],
 ['1581F8DB','Matrice 400','行业级'],['1581F8HH','Matrice 4D','行业级'],['1581F8HG','Matrice 4TD','行业级'],
 ['1748CJD1','Dragonfish Standard','行业级'],['1748CJD2','Dragonfish Lite','行业级'],['1748CJD3','Dragonfish Pro','行业级'],
 ['1748FEV3','EVO Max/MDX-1','行业级'],['1748FEV4','Autel Alpha','行业级'],
-['1588E040','Anafi AI','行业级'],['44332211','Anafi USA','行业级'],
-['YUNH5ETWET','H520 Hexacopter','行业级'],['YUNTYH3EU','Typhoon H3','行业级'],
+['1588E040','ANAMK3 (Anafi AI)','行业级'],['44332211','Anafi USA','行业级'],
+['YUNH5ETWET','H520 Hexacopter','行业级'],['YUNH920202EU','Tornado H920','行业级'],['YUNTYH3EU','Typhoon H3','行业级'],
 ['SDR21V1','Skydio X2E','行业级'],['SDR35V1','Skydio X2','行业级'],['SR47PCV','Skydio X10','行业级'],
 ['1701A000','Percepto Max','行业级'],['1701A001','Percepto Sparrow','行业级'],['1701A002','Percepto Air','行业级'],
 ['1587A000','AgEagle eBee X','测绘级'],['1587A001','AgEagle eBee TAC','测绘级'],['1587A002','AgEagle eBee Geo','测绘级'],
@@ -510,7 +519,7 @@ var UAV_MODELS=[
 ['1688W000','WingtraOne Gen II','测绘级'],['1688W001','WingtraOne GEN I','测绘级'],
 ['18179000','Alta X','影视级'],['18179001','Alta X Gen2','影视级'],['18179002','Alta 8','影视级'],
 ['1581F446','Agras T10/T30','植保级'],['1581F574','Agras T20P/T40','植保级'],['1581F6BU','Agras T50','植保级'],
-['1581F836','Agras T25P','植保级'],['1581F8ZL','Agras T100','植保级'],['1581F8ZX','Agras T70P','植保级'],
+['1581F836','Agras T25P','植保级'],['1581F8ZL','Agras T100','植保级'],['158FAE3X','T100S','植保级'],['1581F8ZX','Agras T70P','植保级'],
 ['1581FAE3','Agras T70S','植保级'],['1758X000','P150 Max','植保级'],['1758X001','P100 Pro','植保级'],
 ['1758X002','P100','植保级'],['1758X003','V40','植保级'],
 ['1581F7C6','FlyCart 30','物流级'],['1581FAN4','FlyCart 100','物流级']
@@ -861,11 +870,23 @@ function loadLeaflet(){
 }
 function initMp(){
   if(mp)return;
-  mp=L.map('mapel',{zoomControl:true});
+  mp=L.map('mapel',{zoomControl:true}).setView([39.9042,116.4074],12);
   var dark=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'});
   var std=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'});
+  var sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,maxNativeZoom:18,attribution:'Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics'});
+  var dk2=L.layerGroup([
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,maxNativeZoom:16,attribution:'&copy; Esri'}),
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,maxNativeZoom:16})
+  ]);
+  var hyb=L.layerGroup([
+    sat,
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',opacity:.9})
+  ]);
   dark.addTo(mp);
-  L.control.layers({'深色底图':dark,'标准底图':std}).addTo(mp);
+  L.control.layers({'深色底图':dark,'深色详细':dk2,'标准底图':std,'卫星影像':sat,'卫星·标注':hyb}).addTo(mp);
+  L.control.scale({imperial:false,maxWidth:120}).addTo(mp);
+  var mh=document.getElementById('mpsc'),msc=document.querySelector('.leaflet-control-scale');
+  if(mh&&msc)mh.appendChild(msc);
   mp.on('dragstart',function(){mpUserMoved=true;});
   setTimeout(function(){if(mp)mp.invalidateSize()},80);
 }

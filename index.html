@@ -220,10 +220,13 @@ svg.i .fd{fill:currentColor;stroke:none}
 #mpctl{position:absolute;left:8px;bottom:8px;z-index:1000;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
 .mp-locbtn{position:absolute;right:8px;bottom:8px;z-index:1000;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:6px;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);padding:0}
 .mp-locbtn svg{width:20px;height:20px}
-.mp-locbtn.on{color:#4CC2FF;border-color:rgba(76,194,255,.55);background:rgba(76,194,255,.14)}
+.mp-locbtn.on{color:#0D47A1;border-color:#0D47A1;background:rgba(255,255,255,.88)}
 .mp-locbtn.wait{opacity:.65}
-#mpfit{background:rgba(7,7,12,.85);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
-#mpfit:active{transform:scale(.97)}
+#mpresize{display:none;position:absolute;left:0;right:0;bottom:-6px;height:10px;z-index:1001;cursor:ns-resize;background:repeating-linear-gradient(180deg,rgba(255,255,255,.25) 0 2px,transparent 2px 6px);border-radius:0 0 8px 8px}
+@media(min-width:900px){#mpresize{display:block}#mpresize:hover{background-color:rgba(76,194,255,.35)}}
+.mp-fitbtn{display:block;margin:6px 0 0;padding:6px 10px;font-size:12px;line-height:1.4;color:#fff;background:#15151c;border:1px solid rgba(255,255,255,.25);border-radius:4px;cursor:pointer;font-family:inherit;text-align:center}
+.mp-fitbtn:hover{background:#1e1e29}
+.mp-fitbtn:active{transform:scale(.97)}
 #mpsc .leaflet-control-scale{margin:0}
 #mpsc .leaflet-control-scale-line{background:rgba(7,7,12,.82);border:1px solid rgba(255,255,255,.3);border-top:none;color:rgba(255,255,255,.79);font-size:10px;line-height:1.4;padding:1px 5px}
 #mplegend{position:relative;background:rgba(7,7,12,.82);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:7px 10px;font-size:11px;line-height:1.9;color:rgba(255,255,255,.79);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
@@ -339,9 +342,9 @@ svg.i .fd{fill:currentColor;stroke:none}
   </select>
   <button class="btn btn2" onclick="clr()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>清空</button>
   <button class="btn btn2" id="mapbtn" onclick="toggleMap()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>地图</button>
-  <button class="btn btn2" id="beepbtn" onclick="toggleBeep()" title="侦测到新目标时播放两声提示音">提示音:关</button>
+  <button class="btn btn2" id="beepbtn" onclick="toggleBeep()" title="新目标与失联提示音">提示音:关</button>
 </div>
-<div id="wrap"><div id="mapbox"><div id="mapel"></div><button id="locbtn" class="mp-locbtn" onclick="locateMe()" title="把地图中心移动到我的位置"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></g></svg></button><div id="mpctl"><button id="mpfit" onclick="mpFitAll()">适应范围</button><div id="mpsc"></div><div id="mplegend"><b onclick="this.parentNode.classList.toggle('min')">图例<span class="lg-arw">▾</span></b><div id="mplg"><div><i style="background:#6CCB5F"></i>信号强（&gt;-70dBm）</div><div><i style="background:#FCE100"></i>信号弱 / 无RSSI</div><div><i style="background:#FF99A4"></i>信号很差</div><div><i style="background:#8a8a8a;opacity:.55"></i>失联 &gt; 5秒</div><div><i style="border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></i>飞手位置</div><div><i style="height:0;width:12px;border-radius:0;border-top:2px solid #4CC2FF"></i>飞行轨迹</div></div></div></div><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
+<div id="wrap"><div id="mapbox"><div id="mapel"></div><button id="locbtn" class="mp-locbtn" onclick="locateMe()" title="把地图中心移动到我的位置"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></g></svg></button><button id="mpfit" class="mp-fitbtn" onclick="mpFitAll()" style="display:none" title="缩放到所有目标">自适应</button><div id="mpctl"><div id="mpsc"></div><div id="mplegend"><b onclick="this.parentNode.classList.toggle('min')">图例<span class="lg-arw">▾</span></b><div id="mplg"><div><i style="background:#6CCB5F"></i>信号强（&gt;-70dBm）</div><div><i style="background:#FCE100"></i>信号弱 / 无RSSI</div><div><i style="background:#FF99A4"></i>信号很差</div><div><i style="background:#8a8a8a;opacity:.55"></i>失联 &gt; 5秒</div><div><i style="border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></i>飞手位置</div><div><i style="height:0;width:12px;border-radius:0;border-top:2px solid #4CC2FF"></i>飞行轨迹</div></div></div></div><div id="mpresize" title="拖动调整地图高度"></div><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
 <div class="lu" id="lu">--</div>
 </section>
 
@@ -590,10 +593,18 @@ if(!DS.isConnected()){if(offTimer)clearTimeout(offTimer);showOff();return;}
     else if(qv&&!qd.model_name)qd.model_name=qv+'设备';
   }
   if(BEEP&&prevMacs){
-    var hadNew=false;
-    for(var bi=0;bi<ds.length;bi++){var bm=ds[bi].mac;if(bm&&prevMacs.indexOf(bm)<0){hadNew=true;break;}}
+    var hadNew=false,hadLost=false,nf={};
+    for(var bi=0;bi<ds.length;bi++){
+      var bm=ds[bi].mac;if(!bm)continue;
+      var st=ds[bi].last_seen>5;
+      if(prevMacs.indexOf(bm)<0)hadNew=true;
+      else if(st&&knownFresh[bm])hadLost=true;
+      if(!st)nf[bm]=1;
+    }
+    knownFresh=nf;
     var tn2=Date.now();
     if(hadNew&&tn2-lastBeep>3000){lastBeep=tn2;playBeep();}
+    else if(hadLost&&tn2-lastLost>3000){lastLost=tn2;playLost();}
   }
   var fw=document.getElementById('fullwarn');
   if(fw){
@@ -824,12 +835,12 @@ window.doCal=doCal;window.resetCal=resetCal;window.closeCal=closeCal;window.onP0
 
 /* ================= 地图视图 ================= */
 var MAPBTN_HTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>地图';
-var MAPBTN_ON_HTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>收起地图';
+var MAPBTN_ON_HTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>收起';
 var mp=null,mpOn=false,mpLoading=null,mpLayers={},mpPrevN=-1,mpUserMoved=false;
 function escMp(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 var mpTrail={};
 var BEEP=false;try{BEEP=localStorage.getItem('ridBeep')==='1';}catch(e){}
-var AC=null,lastBeep=0;
+var AC=null,lastBeep=0,knownFresh={},lastLost=0;
 function llDist(a,b){var r=Math.PI/180,R=6371000,dLa=(b[0]-a[0])*r,dLo=(b[1]-a[1])*r;var x=Math.pow(Math.sin(dLa/2),2)+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.pow(Math.sin(dLo/2),2);return 2*R*Math.asin(Math.sqrt(x));}
 function llFmt(m){return m<1000?Math.round(m)+' m':(m/1000).toFixed(2)+' km';}
 function ppTip(d,p2,ll,label){var h='<b>'+escMp(label||'未知机型')+'</b><br>飞手位置<br>'+p2[0].toFixed(6)+', '+p2[1].toFixed(6);if(ll)h+='<br>距无人机 约 '+llFmt(llDist(p2,ll));return h;}
@@ -842,10 +853,28 @@ function playBeep(){
       var o=AC.createOscillator(),g=AC.createGain();
       o.type='sine';o.frequency.value=f;
       g.gain.setValueAtTime(0.0001,t+i*0.18);
-      g.gain.exponentialRampToValueAtTime(0.22,t+i*0.18+0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001,t+i*0.18+0.16);
+      g.gain.exponentialRampToValueAtTime(0.45,t+i*0.18+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+i*0.18+0.17);
       o.connect(g);g.connect(AC.destination);
-      o.start(t+i*0.18);o.stop(t+i*0.18+0.17);
+      o.start(t+i*0.18);o.stop(t+i*0.18+0.18);
+    });
+  }catch(e){}
+}
+function playLost(){
+  try{
+    if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(!C)return;AC=new C();}
+    if(AC.state==='suspended')AC.resume();
+    var t=AC.currentTime;
+    [[987,0],[659,.2]].forEach(function(cfg){
+      var o=AC.createOscillator(),g=AC.createGain();
+      o.type='triangle';
+      o.frequency.setValueAtTime(cfg[0],t+cfg[1]);
+      o.frequency.exponentialRampToValueAtTime(cfg[0]*0.72,t+cfg[1]+0.16);
+      g.gain.setValueAtTime(0.0001,t+cfg[1]);
+      g.gain.exponentialRampToValueAtTime(0.4,t+cfg[1]+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+cfg[1]+0.18);
+      o.connect(g);g.connect(AC.destination);
+      o.start(t+cfg[1]);o.stop(t+cfg[1]+0.19);
     });
   }catch(e){}
 }
@@ -894,7 +923,7 @@ function locateMe(){
       userUpdate(pos);
       var bb=document.getElementById('locbtn');
       if(bb)bb.className='mp-locbtn on';
-      if(pendCenter&&mp&&userLL){mp.flyTo(userLL,Math.max(mp.getZoom(),15),{duration:.9});pendCenter=false;}
+      if(pendCenter&&mp&&userLL){mp.flyTo(userLL,Math.max(mp.getZoom(),15),{duration:1.6});pendCenter=false;}
     },function(err){
       userStop();
       var bb=document.getElementById('locbtn');
@@ -903,7 +932,7 @@ function locateMe(){
       if(ph){ph.style.display='block';ph.textContent='定位失败：'+(err.code===1?'未授权':(err.code===3?'超时':'不可用'))+'（手机浏览器需 HTTPS）';}
     },{enableHighAccuracy:true,maximumAge:2000,timeout:15000});
   }
-  if(mp&&userLL){mp.flyTo(userLL,Math.max(mp.getZoom(),16),{duration:.9});pendCenter=false;}
+  if(mp&&userLL){mp.flyTo(userLL,Math.max(mp.getZoom(),16),{duration:1.6});pendCenter=false;}
   else pendCenter=true;
 }
 window.locateMe=locateMe;
@@ -990,12 +1019,27 @@ function initMp(){
   L.control.scale({imperial:false,maxWidth:120}).addTo(mp);
   var mh=document.getElementById('mpsc'),msc=document.querySelector('.leaflet-control-scale');
   if(mh&&msc)mh.appendChild(msc);
+  function mountFit(){
+    var lc=document.querySelector('.leaflet-control-layers'),fb=document.getElementById('mpfit');
+    if(lc&&fb){lc.parentNode.insertBefore(fb,lc.nextSibling);fb.style.display='';return true;}
+    return false;
+  }
+  if(!mountFit())setTimeout(mountFit,150);
   var savedBase=null;try{savedBase=localStorage.getItem('ridBase');}catch(e){}
   if(savedBase==='卫星·标注')savedBase='卫星标注';
   if(savedBase&&BASES[savedBase]&&savedBase!=='深色底图'){mp.removeLayer(dark);BASES[savedBase].addTo(mp);}
   mp.on('baselayerchange',function(ev){try{localStorage.setItem('ridBase',ev.name);}catch(e){}});
   mp.on('dragstart',function(){mpUserMoved=true;});
-  setTimeout(function(){if(mp)mp.invalidateSize()},80);
+  initResize();
+}
+function initResize(){
+  var h=document.getElementById('mpresize'),box=document.getElementById('mapbox');
+  if(!h||!box||h.dataset.bound)return;
+  h.dataset.bound='1';
+  var sy=0,sh=0;
+  function mv(e){var nh=Math.max(240,Math.min(window.innerHeight-220,sh+(e.clientY-sy)));box.style.height=nh+'px';if(mp)mp.invalidateSize();}
+  function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.body.style.cursor='';try{localStorage.setItem('ridMapH',box.style.height);}catch(e){}if(mp)mp.invalidateSize();}
+  h.addEventListener('mousedown',function(e){sy=e.clientY;sh=box.offsetHeight;document.body.style.cursor='ns-resize';document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);e.preventDefault();});
 }
 function dIcon(col,label,stale,ping){
   var dot='<span style="position:absolute;left:50%;top:50%;width:11px;height:11px;margin:-5.5px;border-radius:50%;background:'+col+(stale?';opacity:.45':';box-shadow:0 0 8px '+col)+'"></span>';
@@ -1127,6 +1171,7 @@ function toggleMap(){
     box.classList.add('on');
     btn.classList.add('on');
     btn.innerHTML=MAPBTN_ON_HTML;
+    try{var sh2=localStorage.getItem('ridMapH');if(sh2)box.style.height=sh2;}catch(e){}
     loadLeaflet().then(function(){
       initMp();
       setTimeout(function(){if(mp)mp.invalidateSize()},60);

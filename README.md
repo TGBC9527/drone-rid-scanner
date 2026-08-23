@@ -11,16 +11,7 @@ ESP32 无人机 Remote ID 侦测器 —— 基于 Wi-Fi 混杂模式监听周边
 - 板载 WS2812 RGB 状态灯：模式 / 亮度 / 颜色 / 轮换速度可调，设置保存于 NVS 掉电不丢
 - 配套网页控制台（Web Serial / Web Bluetooth）：目标列表、系统状态、灯效设置
 
-## 目录结构
 
-```
-DroneScanner-main/
-├── DroneScanner/          # 历史版本固件（含伪造发射功能）
-├── web/                   # 历史版本网页控制台
-└── clean/                 # ★ 清理版（已移除全部伪造发射功能，仅保留侦测）
-    ├── DroneScanner/      #   清理后固件源码（Arduino 工程）
-    └── web/               #   清理后网页控制台
-```
 
 ## 硬件要求
 

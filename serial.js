@@ -368,6 +368,24 @@
 
   /* ---------- 顶部连接栏 UI ---------- */
   var barHost = null;
+
+  // 把浏览器原始报错压缩成短语，避免长英文提示撑爆顶栏
+  function shortErr(msg) {
+    var s = String(msg || '');
+    if (/取消|cancel/i.test(s)) return '用户取消';
+    if (/no-saved-port/i.test(s)) return '无已存设备';
+    if (/NotFound|No port selected|未选择/i.test(s)) return '未选设备';
+    if (/already open|in progress|busy|占用/i.test(s)) return '串口被占用';
+    if (/open-timeout|timeout|超时/i.test(s)) return '连接超时';
+    if (/Failed to open|open failed/i.test(s)) return '打开失败';
+    if (/adapter|GATT|disconnect|unavailable|不可用/i.test(s)) return '设备不可达';
+    s = s.replace(/^蓝牙连接失败：/, '').replace(/^自动重连失败：/, '').replace(/^打开串口超时（[^）]*）/, '');
+    if (s.length > 14) s = s.slice(0, 14) + '…';
+    return s;
+  }
+
+  var ELLIP = 'flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+
   function renderBar() {
     if (!barHost) return;
     var colors = { off: '#FF99A4', connecting: '#FCE100', ok: '#6CCB5F', lost: '#FF99A4', unsupported: '#FF99A4' };
@@ -375,38 +393,40 @@
       off: '未连接', connecting: '连接中…', ok: '已连接', lost: '连接断开', unsupported: '浏览器不支持 Web Serial'
     };
     var c = colors[state] || '#999';
-    var html = '<div style="display:flex;align-items:center;gap:8px;background:#111;border-bottom:1px solid rgba(255,255,255,.12);padding:7px 16px;font-size:12px;color:rgba(255,255,255,.85);flex-wrap:wrap">'
+    var html = '<div style="display:flex;align-items:center;gap:8px;background:#111;border-bottom:1px solid rgba(255,255,255,.12);padding:7px 12px;font-size:12px;color:rgba(255,255,255,.85);flex-wrap:nowrap;overflow:hidden">'
       + '<span style="width:8px;height:8px;border-radius:50%;background:' + c + ';flex-shrink:0"></span>'
-      + '<span style="font-weight:600">' + labels[state] + '</span>'
-      + (state === 'ok' ? '<span style="color:rgba(255,255,255,.45)">' + (bleGatt ? 'BLE 已连接 · 数据走蓝牙' : 'USB 串口已打开 · 数据走 Web Serial') + '</span>' : '')
-      + (state === 'ok' && warnText ? '<span style="color:#FCE100;max-width:55%;min-width:200px">' + escHtml(warnText) + '</span>' : '')
-      + '<span style="flex:1"></span>';
+      + '<span style="font-weight:600;flex-shrink:0">' + labels[state] + '</span>'
+      + (state === 'ok' ? '<span style="color:rgba(255,255,255,.45);flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (bleGatt ? 'BLE 已连接 · 数据走蓝牙' : 'USB 串口已打开 · 数据走 Web Serial') + '</span>' : '')
+      + (state === 'ok' && warnText ? '<span style="color:#FCE100;' + ELLIP + '">' + escHtml(warnText) + '</span>' : '');
     if (state === 'off' || state === 'lost') {
       if (state === 'lost' && lastErr) {
         var isBt = lastErr.indexOf('蓝牙') >= 0;
-        html += '<span style="color:rgba(255,255,255,.45);max-width:55%;min-width:200px">原因：' + escHtml(lastErr)
-          + (isBt ? '。请确认板子已开机 5 秒以上（蓝牙自动开启），并在手机系统蓝牙设置里能看到 DroneScanner。'
-                  : '。同一串口只能被一个程序占用，请关闭 Arduino IDE 串口监视器和其他标签页，可拔出 USB 重插后再试。')
+        html += '<span style="color:rgba(255,255,255,.45);' + ELLIP + '" title="' + escHtml(lastErr) + '">'
+          + (isBt ? '蓝牙失败：' : 'USB 失败：') + escHtml(shortErr(lastErr))
+          + ' · ' + (isBt ? '确认开机5秒且蓝牙开' : '关闭占用后重插')
           + '</span>';
+      } else {
+        html += '<span style="flex:1"></span>';
       }
-      html += '<button id="dsbtn" style="background:#4CC2FF;color:#000;border:none;border-radius:4px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer">USB 连接</button>';
+      html += '<button id="dsbtn" style="background:#4CC2FF;color:#000;border:none;border-radius:4px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0">USB 连接</button>';
       if (navigator.bluetooth) {
-        html += '<button id="dsbt" style="background:rgba(80,180,255,.25);color:#8fd0ff;border:1px solid rgba(80,180,255,.45);border-radius:4px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer">蓝牙连接</button>';
+        html += '<button id="dsbt" style="background:rgba(80,180,255,.25);color:#8fd0ff;border:1px solid rgba(80,180,255,.45);border-radius:4px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0">蓝牙连接</button>';
       }
     } else if (state === 'connecting') {
-      html += '<span style="color:rgba(255,255,255,.45)">'
-        + (autoRetrying ? '设备刚被复位，正在自动重连…' : '正在连接…（USB 会自动连已记住的设备；蓝牙请在弹出的列表里选择 DroneScanner）')
+      html += '<span style="color:rgba(255,255,255,.45);' + ELLIP + '">'
+        + (autoRetrying ? '复位后自动重连中…' : '正在连接…按提示选择设备')
         + '</span>';
-      html += '<button id="dsbtn2" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:12px;cursor:pointer">取消</button>';
+      html += '<button id="dsbtn2" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:12px;cursor:pointer;flex-shrink:0">取消</button>';
     } else if (state === 'ok') {
+      if (!warnText) html += '<span style="flex:1"></span>';
       if (bleGatt) {
-        html += '<button id="dsbt2" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:12px;cursor:pointer">断开蓝牙</button>';
+        html += '<button id="dsbt2" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:12px;cursor:pointer;flex-shrink:0">断开蓝牙</button>';
       } else {
-        html += '<button id="dsbtn2" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:12px;cursor:pointer">切换设备</button>';
+        html += '<button id="dsbtn2" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:12px;cursor:pointer;flex-shrink:0">切换设备</button>';
       }
-      html += '<button id="dsbtn3" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:12px;cursor:pointer">调试</button>';
+      html += '<button id="dsbtn3" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:12px;cursor:pointer;flex-shrink:0">调试</button>';
     } else if (state === 'unsupported') {
-      html += '<span style="color:rgba(255,255,255,.45)">需使用 Chrome（Android 需较新版本），并需 HTTPS 页面</span>';
+      html += '<span style="color:rgba(255,255,255,.45);' + ELLIP + '">需使用 Chrome 并 HTTPS 页面</span>';
     }
     barHost.innerHTML = html;
     var btn = document.getElementById('dsbtn');

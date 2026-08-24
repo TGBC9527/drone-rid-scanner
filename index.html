@@ -222,8 +222,15 @@ svg.i .fd{fill:currentColor;stroke:none}
 .mp-locbtn svg{width:20px;height:20px}
 .mp-locbtn.on{color:#0D47A1;border-color:#0D47A1;background:rgba(255,255,255,.88)}
 .mp-locbtn.wait{opacity:.65}
-#mpresize{display:none;position:absolute;left:0;right:0;bottom:-6px;height:10px;z-index:1001;cursor:ns-resize;background:repeating-linear-gradient(180deg,rgba(255,255,255,.25) 0 2px,transparent 2px 6px);border-radius:0 0 8px 8px}
-@media(min-width:900px){#mpresize{display:block}#mpresize:hover{background-color:rgba(76,194,255,.35)}}
+#mpresize{display:none;position:absolute;left:0;right:0;bottom:-6px;height:10px;z-index:1001;cursor:ns-resize;background:repeating-linear-gradient(180deg,rgba(255,255,255,.25) 0 2px,transparent 2px 6px);border-radius:0 0 8px 8px;touch-action:none;-webkit-tap-highlight-color:transparent}
+@media(min-width:900px){#mpresize{display:block}#mpresize:hover{background-color:rgba(76,194,255,.35)}#mpresize.active{background-color:rgba(76,194,255,.6)}}
+.mp-fsbtn{position:absolute;right:8px;bottom:52px;z-index:1000;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:6px;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);padding:0;font-family:inherit}
+.mp-fsbtn svg{width:20px;height:20px}
+.mp-fsbtn:active{transform:scale(.94)}
+#mapbox:fullscreen{height:auto!important;margin:0;border:none;border-radius:0}
+#mapbox:fullscreen #mpresize,#mapbox.fs-fixed #mpresize{display:none!important}
+#mapbox.fs-fixed{position:fixed;left:0;right:0;top:0;bottom:0;height:auto;margin:0;border:none;border-radius:0;z-index:9999;animation:none}
+#tilehint{display:none;position:absolute;left:50%;transform:translateX(-50%);top:8px;z-index:1002;background:rgba(7,7,12,.88);border:1px solid rgba(252,225,0,.45);color:#FCE100;border-radius:6px;padding:5px 12px;font-size:11px;line-height:1.5;pointer-events:none;max-width:86%;text-align:center}
 .mp-fitbtn{display:block;margin:6px 0 0;padding:6px 10px;font-size:12px;line-height:1.4;color:#fff;background:#15151c;border:1px solid rgba(255,255,255,.25);border-radius:4px;cursor:pointer;font-family:inherit;text-align:center}
 .mp-fitbtn:hover{background:#1e1e29}
 .mp-fitbtn:active{transform:scale(.97)}
@@ -344,7 +351,7 @@ svg.i .fd{fill:currentColor;stroke:none}
   <button class="btn btn2" id="mapbtn" onclick="toggleMap()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>地图</button>
   <button class="btn btn2" id="beepbtn" onclick="toggleBeep()" title="新目标与失联提示音">提示音:关</button>
 </div>
-<div id="wrap"><div id="mapbox"><div id="mapel"></div><button id="locbtn" class="mp-locbtn" onclick="locateMe()" title="把地图中心移动到我的位置"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></g></svg></button><button id="mpfit" class="mp-fitbtn" onclick="mpFitAll()" style="display:none" title="缩放到所有目标">自适应</button><div id="mpctl"><div id="mpsc"></div><div id="mplegend"><b onclick="this.parentNode.classList.toggle('min')">图例<span class="lg-arw">▾</span></b><div id="mplg"><div><i style="background:#6CCB5F"></i>信号强（&gt;-70dBm）</div><div><i style="background:#FCE100"></i>信号弱 / 无RSSI</div><div><i style="background:#FF99A4"></i>信号很差</div><div><i style="background:#8a8a8a;opacity:.55"></i>失联 &gt; 5秒</div><div><i style="border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></i>飞手位置</div><div><i style="height:0;width:12px;border-radius:0;border-top:2px solid #4CC2FF"></i>飞行轨迹</div></div></div></div><div id="mpresize" title="拖动调整地图高度"></div><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
+<div id="wrap"><div id="mapbox"><div id="mapel"></div><button id="locbtn" class="mp-locbtn" onclick="locateMe()" title="把地图中心移动到我的位置"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></g></svg></button><button id="fsbtn" class="mp-fsbtn" onclick="toggleFs()" title="地图全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><div id="tilehint"></div><button id="mpfit" class="mp-fitbtn" onclick="mpFitAll()" style="display:none" title="缩放到所有目标">自适应</button><div id="mpctl"><div id="mpsc"></div><div id="mplegend"><b onclick="this.parentNode.classList.toggle('min')">图例<span class="lg-arw">▾</span></b><div id="mplg"><div><i style="background:#6CCB5F"></i>信号强（&gt;-70dBm）</div><div><i style="background:#FCE100"></i>信号弱 / 无RSSI</div><div><i style="background:#FF99A4"></i>信号很差</div><div><i style="background:#8a8a8a;opacity:.55"></i>失联 &gt; 5秒</div><div><i style="border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></i>飞手位置</div><div><i style="height:0;width:12px;border-radius:0;border-top:2px solid #4CC2FF"></i>飞行轨迹</div></div></div></div><div id="mpresize" title="拖动调整地图高度"></div><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
 <div class="lu" id="lu">--</div>
 </section>
 
@@ -440,6 +447,7 @@ var cur = null;
 function go(name) {
   if (cur === name) return;
   if (cur === 'scan' && typeof scanStop === 'function') scanStop();
+  if (cur === 'scan' && typeof scanExitFs === 'function') scanExitFs();
   if (cur === 'status' && typeof statusStop === 'function') statusStop();
   cur = name;
   var ps = document.querySelectorAll('.page');
@@ -1001,20 +1009,33 @@ function loadLeaflet(){
   });
   return mpLoading;
 }
+function esriL(path,opt){
+  var o={maxZoom:19},k;if(opt)for(k in opt)o[k]=opt[k];
+  return L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/'+path+'/MapServer/tile/{z}/{y}/{x}',o);
+}
 function initMp(){
   if(mp)return;
   mp=L.map('mapel',{zoomControl:true}).setView([39.9042,116.4074],12);
-  var dark=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'});
-  var std=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'});
-  var sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,maxNativeZoom:18,attribution:'Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics'});
+  var sat=esriL('World_Imagery',{maxNativeZoom:18,attribution:'Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics'});
+  var dark=L.layerGroup([
+    esriL('Canvas/World_Dark_Gray_Base',{maxNativeZoom:16}),
+    esriL('Canvas/World_Dark_Gray_Reference',{maxNativeZoom:16})
+  ]);
+  var std=esriL('World_Street_Map',{attribution:'&copy; Esri'});
   var dko=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,className:'osm-dark',attribution:'&copy; OpenStreetMap'});
+  var osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'});
   var hyb=L.layerGroup([
     sat,
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,maxNativeZoom:16}),
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',className:'lbl-halo'})
   ]);
-  var BASES={'深色底图':dark,'深色全要素':dko,'标准底图':std,'卫星影像':sat,'卫星标注':hyb};
-  dark.addTo(mp);
+  var BASES={'深色底图':dark,'深色全要素':dko,'标准底图':std,'卫星影像':sat,'卫星标注':hyb,'OSM 标准':osm};
+  var FBMAP={'深色底图':'深色全要素','深色全要素':'深色底图','标准底图':'OSM 标准','OSM 标准':'标准底图'};
+  var curBase='深色底图',baseSwitched=false,baseStat={};
+  var savedBase=null;try{savedBase=localStorage.getItem('ridBase');}catch(e){}
+  if(savedBase==='卫星·标注')savedBase='卫星标注';
+  if(savedBase&&BASES[savedBase])curBase=savedBase;
+  BASES[curBase].addTo(mp);
   L.control.layers(BASES).addTo(mp);
   L.control.scale({imperial:false,maxWidth:120}).addTo(mp);
   var mh=document.getElementById('mpsc'),msc=document.querySelector('.leaflet-control-scale');
@@ -1025,10 +1046,46 @@ function initMp(){
     return false;
   }
   if(!mountFit())setTimeout(mountFit,150);
-  var savedBase=null;try{savedBase=localStorage.getItem('ridBase');}catch(e){}
-  if(savedBase==='卫星·标注')savedBase='卫星标注';
-  if(savedBase&&BASES[savedBase]&&savedBase!=='深色底图'){mp.removeLayer(dark);BASES[savedBase].addTo(mp);}
-  mp.on('baselayerchange',function(ev){try{localStorage.setItem('ridBase',ev.name);}catch(e){}});
+  function bstat(nm){
+    var s=baseStat[nm];
+    if(!s)s=baseStat[nm]={e:0,l:0,t:Date.now()};
+    if(Date.now()-s.t>30000){s.e=0;s.l=0;s.t=Date.now();}
+    return s;
+  }
+  function showTileHint(msg){
+    var t=document.getElementById('tilehint');if(!t)return;
+    t.textContent=msg;t.style.display='block';
+    clearTimeout(showTileHint._tm);
+    showTileHint._tm=setTimeout(function(){t.style.display='none';},6000);
+  }
+  function setBase(nm){
+    var old=BASES[curBase];
+    if(old){try{mp.removeLayer(old);}catch(x){}}
+    BASES[nm].addTo(mp);
+    curBase=nm;
+    try{localStorage.setItem('ridBase',nm);}catch(x){}
+  }
+  for(var bn in BASES){
+    (function(nm){
+      var arr=BASES[nm].getLayers?BASES[nm].getLayers():[BASES[nm]];
+      arr.forEach(function(ly){
+        ly.on('tileerror',function(){
+          var s=bstat(nm);s.e++;
+          if(curBase!==nm||baseSwitched)return;
+          if(s.e>=8&&s.e>s.l*2&&FBMAP[nm]){
+            baseSwitched=true;
+            setBase(FBMAP[nm]);
+            showTileHint('「'+nm+'」底图源加载失败，已自动切换为「'+FBMAP[nm]+'」');
+          }
+        });
+        ly.on('tileload',function(){bstat(nm).l++;});
+      });
+    })(bn);
+  }
+  mp.on('baselayerchange',function(ev){
+    curBase=ev.name;baseSwitched=false;baseStat={};
+    try{localStorage.setItem('ridBase',ev.name);}catch(e){}
+  });
   mp.on('dragstart',function(){mpUserMoved=true;});
   initResize();
 }
@@ -1036,10 +1093,46 @@ function initResize(){
   var h=document.getElementById('mpresize'),box=document.getElementById('mapbox');
   if(!h||!box||h.dataset.bound)return;
   h.dataset.bound='1';
-  var sy=0,sh=0;
-  function mv(e){var nh=Math.max(240,Math.min(window.innerHeight-220,sh+(e.clientY-sy)));box.style.height=nh+'px';if(mp)mp.invalidateSize();}
-  function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.body.style.cursor='';try{localStorage.setItem('ridMapH',box.style.height);}catch(e){}if(mp)mp.invalidateSize();}
-  h.addEventListener('mousedown',function(e){sy=e.clientY;sh=box.offsetHeight;document.body.style.cursor='ns-resize';document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);e.preventDefault();});
+  var raf=0,nh=0,sy=0,sh=0,minH=240,maxH=600,dragging=false;
+  function apply(){
+    raf=0;
+    box.style.height=nh+'px';
+    if(mp)mp.invalidateSize();
+  }
+  function mv(e){
+    if(!dragging)return;
+    nh=Math.max(minH,Math.min(maxH,Math.round(sh+(e.clientY-sy))));
+    if(!raf)raf=requestAnimationFrame(apply);
+  }
+  function down(e){
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    dragging=true;
+    sy=e.clientY;sh=box.offsetHeight;
+    minH=240;maxH=Math.max(minH+40,window.innerHeight-220);
+    h.classList.add('active');
+    document.body.style.userSelect='none';document.body.style.webkitUserSelect='none';
+    try{h.setPointerCapture(e.pointerId);}catch(err){}
+    e.preventDefault();
+  }
+  function up(){
+    if(!dragging)return;
+    dragging=false;
+    if(raf){cancelAnimationFrame(raf);raf=0;}
+    apply();
+    h.classList.remove('active');
+    document.body.style.userSelect='';document.body.style.webkitUserSelect='';
+    try{localStorage.setItem('ridMapH',box.style.height);}catch(err){}
+  }
+  function dbl(){
+    box.style.height='';
+    try{localStorage.removeItem('ridMapH');}catch(err){}
+    if(mp)mp.invalidateSize();
+  }
+  h.addEventListener('pointerdown',down);
+  h.addEventListener('pointermove',mv);
+  h.addEventListener('pointerup',up);
+  h.addEventListener('pointercancel',up);
+  h.addEventListener('dblclick',dbl);
 }
 function dIcon(col,label,stale,ping){
   var dot='<span style="position:absolute;left:50%;top:50%;width:11px;height:11px;margin:-5.5px;border-radius:50%;background:'+col+(stale?';opacity:.45':';box-shadow:0 0 8px '+col)+'"></span>';
@@ -1200,6 +1293,68 @@ function toggleMap(){
 }
 window.toggleMap=toggleMap;
 window.mpFitAll=mpFitAll;
+
+/* ---- 地图全屏（原生 Fullscreen API，iOS 无原生支持时用伪全屏） ---- */
+var FS_HTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
+var FSX_HTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
+var fsPseudo=false;
+function fsSetIcon(on){
+  var b=document.getElementById('fsbtn');
+  if(b)b.innerHTML=on?FSX_HTML:FS_HTML;
+}
+function fsInvalidate(){
+  setTimeout(function(){if(mp)mp.invalidateSize();},80);
+}
+function enterPseudoFs(box){
+  fsPseudo=true;
+  box.classList.add('fs-fixed');
+  document.body.style.overflow='hidden';
+  fsSetIcon(true);
+  fsInvalidate();
+}
+function exitPseudoFs(box){
+  if(!fsPseudo)return;
+  fsPseudo=false;
+  box.classList.remove('fs-fixed');
+  document.body.style.overflow='';
+  fsSetIcon(false);
+  fsInvalidate();
+}
+function toggleFs(){
+  var box=document.getElementById('mapbox');
+  if(!box||!mp)return;
+  var fsEl=document.fullscreenElement||document.webkitFullscreenElement;
+  if(fsEl){
+    if(document.exitFullscreen)document.exitFullscreen();
+    else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+    return;
+  }
+  if(fsPseudo){exitPseudoFs(box);return;}
+  var req=box.requestFullscreen||box.webkitRequestFullscreen;
+  if(req){
+    try{
+      var p=box.requestFullscreen?box.requestFullscreen():box.webkitRequestFullscreen();
+      if(p&&p.catch)p.catch(function(){enterPseudoFs(box);});
+    }catch(e){enterPseudoFs(box);}
+  }else enterPseudoFs(box);
+}
+function scanExitFs(){
+  var box=document.getElementById('mapbox');
+  var fsEl=document.fullscreenElement||document.webkitFullscreenElement;
+  if(fsEl){
+    if(document.exitFullscreen)document.exitFullscreen();
+    else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+  }else if(fsPseudo&&box)exitPseudoFs(box);
+}
+function fsSyncUi(){
+  var fsEl=document.fullscreenElement||document.webkitFullscreenElement;
+  fsSetIcon(!!fsEl);
+  fsInvalidate();
+}
+document.addEventListener('fullscreenchange',fsSyncUi);
+document.addEventListener('webkitfullscreenchange',fsSyncUi);
+window.toggleFs=toggleFs;
+window.scanExitFs=scanExitFs;
 
 })();
 </script>

@@ -402,6 +402,7 @@ svg.i .fd{fill:currentColor;stroke:none}
       <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/></svg>监听信道</span><span class="v" id="nCh">--</span></div>
       <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><path d="M8 9a5 5 0 0 0 0 6"/><path d="M16 9a5 5 0 0 1 0 6"/></svg>信道带宽</span><span class="v" id="nBw">--</span></div>
       <div class="row"><span class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>发射功率</span><span class="v" id="nTx">--</span></div>
+      <div class="row"><span class="k">固件版本</span><span class="v" id="nFw">--</span></div>
     </div>
   </div>
   <div class="sec">
@@ -413,14 +414,23 @@ svg.i .fd{fill:currentColor;stroke:none}
           <option value="1">单色固定</option>
           <option value="2">彩色轮换（彩虹）</option>
           <option value="3">关闭</option>
+          <option value="4">侦测闪烁（有飞机才闪）</option>
         </select></div>
       <div class="bar-row" id="ledColorRow" style="display:none"><div class="bt"><span>颜色</span><b id="ledHex">#00FF00</b></div>
         <input type="color" id="ledColor" value="#00ff00" style="width:100%;height:34px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);border-radius:4px;cursor:pointer"></div>
       <div class="bar-row"><div class="bt"><span>亮度</span><b id="ledBrightV">100%</b></div>
         <input type="range" id="ledBright" min="0" max="100" step="1" value="100" style="width:100%;accent-color:#4CC2FF"></div>
-      <div class="bar-row" id="ledSpeedRow" style="display:none"><div class="bt"><span>轮换速度</span><b id="ledSpeedV">50</b></div>
+      <div class="bar-row" id="ledSpeedRow" style="display:none"><div class="bt"><span>速度</span><b id="ledSpeedV">50</b></div>
         <input type="range" id="ledSpeed" min="0" max="100" step="1" value="50" style="width:100%;accent-color:#4CC2FF">
-        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.5">越大彩虹转得越快。已按平滑步进处理，不会跳色。</div></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.5">彩虹轮换 / 侦测闪烁的节奏，越大越快。</div></div>
+      <div class="bar-row" id="ledStyleRow" style="display:none"><div class="bt"><span>闪烁样式</span><b id="ledStyleV">硬闪</b></div>
+        <select id="ledStyle" style="width:100%;padding:9px 10px;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:4px;font-size:13px;outline:none">
+          <option value="0">硬闪：亮灭交替，最醒目</option>
+          <option value="1">呼吸：渐亮渐灭循环</option>
+          <option value="2">警示双闪：快两连闪+停顿</option>
+          <option value="3">心跳：咚-咚——停节奏</option>
+        </select>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.5">无飞机时灯全灭；最近 10 秒内收到过飞机信号就开始闪烁提醒。</div></div>
       <div class="bar-row"><div class="bt"><span>开机灯效</span><b id="ledBootV">快速显示保存灯效</b></div>
         <select id="ledBoot" style="width:100%;padding:9px 10px;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:4px;font-size:13px;outline:none">
           <option value="1">快速：开机白闪一下，立刻显示保存灯效</option>
@@ -440,7 +450,7 @@ svg.i .fd{fill:currentColor;stroke:none}
 </section>
 
 
-<script src="serial.js?v24108"></script>
+<script src="serial.js?v24109"></script>
 <script>
 /* ================= 全局：页面导航 + 串口栏 ================= */
 var cur = null;
@@ -604,10 +614,10 @@ if(!DS.isConnected()){if(offTimer)clearTimeout(offTimer);showOff();return;}
     var hadNew=false,hadLost=false,nf={};
     for(var bi=0;bi<ds.length;bi++){
       var bm=ds[bi].mac;if(!bm)continue;
-      var st=ds[bi].last_seen>5;
+      var wasFresh=ds[bi].last_seen>5;
       if(prevMacs.indexOf(bm)<0)hadNew=true;
-      else if(st&&knownFresh[bm])hadLost=true;
-      if(!st)nf[bm]=1;
+      else if(wasFresh&&knownFresh[bm])hadLost=true;
+      if(!wasFresh)nf[bm]=1;
     }
     knownFresh=nf;
     var tn2=Date.now();
@@ -1388,6 +1398,7 @@ function sysLoad(){
     setT('rNan',Number(d.nan_da).toLocaleString());setT('rRid',Number(d.rid_ie).toLocaleString());
     setT('nCh',d.channel);setT('nBw',d.bw+' MHz');
     setT('nTx',d.wifi_tx_power+' dBm（约 '+Math.round(Math.pow(10,d.wifi_tx_power/10))+' mW）');
+    setT('nFw',d.fw?('v'+d.fw):'未知（固件过旧，请更新固件）');
     setT('slu','更新: '+new Date().toLocaleTimeString('zh-CN'));
   }).catch(function(){setT('slu','设备无响应 — 请确认 ESP32 已烧录新固件（串口监视器输入 SYS 应回 JSON 行）');}).then(function(){sysBusy=false;});
 }
@@ -1397,7 +1408,8 @@ window.statusStop=function(){if(sysTimer){clearInterval(sysTimer);sysTimer=null;
 
 /* ---------- RGB 灯效 ---------- */
 var ledColor='#00ff00', ledBright=100;
-var MODE_NAMES={0:'状态联动',1:'单色固定',2:'彩色轮换',3:'关闭'};
+var MODE_NAMES={0:'状态联动',1:'单色固定',2:'彩色轮换',3:'关闭',4:'侦测闪烁'};
+var STYLE_NAMES={0:'硬闪',1:'呼吸',2:'警示双闪',3:'心跳'};
 function hex2rgb(h){h=h.replace('#','');var n=parseInt(h,16)||0;return [n>>16&255,n>>8&255,n&255];}
 function rgb2hex(r,g,b){function p(v){v=Math.max(0,Math.min(255,v|0));return(v<16?'0':'')+v.toString(16);}return '#'+p(r)+p(g)+p(b);}
 function ledCfgLoad(){
@@ -1408,6 +1420,7 @@ function ledCfgLoad(){
     document.getElementById('ledBright').value=d.bright;
     ledBright=d.bright;
     var sp=document.getElementById('ledSpeed');if(sp)sp.value=(d.speed==null?50:d.speed);
+    var st=document.getElementById('ledStyle');if(st)st.value=String(d.style==null?0:d.style);
     var bo=document.getElementById('ledBoot');if(bo)bo.value=String(d.boot==null?1:d.boot);
     ledSyncUI();
   }).catch(function(){});
@@ -1415,9 +1428,11 @@ function ledCfgLoad(){
 function ledSyncUI(){
   var m=parseInt(document.getElementById('ledMode').value,10);
   document.getElementById('ledModeV').textContent=MODE_NAMES[m]||('模式'+m);
-  document.getElementById('ledColorRow').style.display=(m===1)?'block':'none';
-  var sr=document.getElementById('ledSpeedRow');
-  if(sr)sr.style.display=(m===2)?'flex':'none';
+  document.getElementById('ledColorRow').style.display=(m===1||m===4)?'block':'none';
+  var sr=document.getElementById('ledStyleRow');
+  if(sr){sr.style.display=(m===4)?'flex':'none';var sv2=document.getElementById('ledStyle');if(sv2)document.getElementById('ledStyleV').textContent=STYLE_NAMES[sv2.value]||'硬闪';}
+  sr=document.getElementById('ledSpeedRow');
+  if(sr)sr.style.display=(m===2||m===4)?'flex':'none';
   var b=parseInt(document.getElementById('ledBright').value,10);
   document.getElementById('ledBrightV').textContent=b+'%';
   var sv=document.getElementById('ledSpeed');if(sv)document.getElementById('ledSpeedV').textContent=sv.value;
@@ -1426,7 +1441,7 @@ function ledSyncUI(){
   var bo=document.getElementById('ledBoot');var bv=document.getElementById('ledBootV');
   if(bo&&bv)bv.textContent=(bo.value==='2')?'直接显示（不闪）':((bo.value==='0')?'自检轮播':'快速白闪');
 }
-function ledQ(){var sp=document.getElementById('ledSpeed');return 'mode='+document.getElementById('ledMode').value+'&boot='+document.getElementById('ledBoot').value+'&speed='+(sp?sp.value:50)+'&r='+hex2rgb(ledColor)[0]+'&g='+hex2rgb(ledColor)[1]+'&b='+hex2rgb(ledColor)[2]+'&bright='+document.getElementById('ledBright').value;}
+function ledQ(){var sp=document.getElementById('ledSpeed');var st=document.getElementById('ledStyle');return 'mode='+document.getElementById('ledMode').value+'&boot='+document.getElementById('ledBoot').value+'&speed='+(sp?sp.value:50)+'&style='+(st?st.value:0)+'&r='+hex2rgb(ledColor)[0]+'&g='+hex2rgb(ledColor)[1]+'&b='+hex2rgb(ledColor)[2]+'&bright='+document.getElementById('ledBright').value;}
 var ledAutoTimer=null;
 function ledAutoPreview(){if(ledAutoTimer)clearTimeout(ledAutoTimer);ledAutoTimer=setTimeout(function(){ledPreview();},250);}
 function ledPreview(){DS.cmd('LED '+ledQ(),3000).then(function(){var i=document.getElementById('ledInfo');if(i)i.textContent='已发送到设备预览。点「保存」写入 NVS。';}).catch(function(){var i=document.getElementById('ledInfo');if(i)i.textContent='预览失败：命令未送达（检查串口连接）。';});}
@@ -1436,6 +1451,7 @@ function ledSave(){DS.cmd('LED '+ledQ(),3000).then(function(){var i=document.get
   var c=document.getElementById('ledColor');if(c)c.addEventListener('input',function(){ledColor=c.value;ledSyncUI();ledAutoPreview();});
   var b=document.getElementById('ledBright');if(b)b.addEventListener('input',function(){ledBright=parseInt(b.value,10);ledSyncUI();ledAutoPreview();});
   var sp=document.getElementById('ledSpeed');if(sp)sp.addEventListener('input',function(){ledSyncUI();ledAutoPreview();});
+  var st=document.getElementById('ledStyle');if(st)st.addEventListener('change',function(){ledSyncUI();ledAutoPreview();});
   var mo=document.getElementById('ledMode');if(mo)mo.addEventListener('change',function(){ledSyncUI();ledAutoPreview();});
   var bo=document.getElementById('ledBoot');if(bo)bo.addEventListener('change',function(){ledSyncUI();ledAutoPreview();});
   var p=document.getElementById('ledPreview');if(p)p.addEventListener('click',ledPreview);

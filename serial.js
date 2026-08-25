@@ -24,6 +24,18 @@
   var autoRetried = false;   // 本次会话/本次手动连接是否已自动重连过（防死循环）
   var autoRetrying = false;  // 正在自动重连（顶栏提示用）
   var warnText = '';          // 连接后的警告（连错设备/旧固件）
+  var FW_MIN = '2.1';         // 本页要求的最低固件版本（低于此版本或取不到版本都提示更新固件）
+  var fwVer = '';             // 连接后从 PING 回包获取的固件版本（空=未获取到，旧固件无此字段）
+
+  // 版本号比较：按 '.' 分段转数字逐段比；a<b 返回 -1，a>b 返回 1，相等返回 0
+  function fwCmp(a, b) {
+    var pa = String(a || '').split('.'), pb = String(b || '').split('.');
+    for (var i = 0; i < Math.max(pa.length, pb.length); i++) {
+      var x = parseInt(pa[i], 10) || 0, y = parseInt(pb[i], 10) || 0;
+      if (x !== y) return x < y ? -1 : 1;
+    }
+    return 0;
+  }
 
   function setState(s) {
     if (s === state) return;
@@ -45,6 +57,7 @@
   function setWarn(t) { warnText = t; renderBar(); }
 
   // 连接后的设备验证：只有烧录了新固件的 ESP32 会回 PING 的 JSON 回包。
+  // 同时做固件版本检查：回包无 fw 字段（旧固件）或版本低于 FW_MIN 都在顶栏提示更新固件。
   // 打开串口的瞬间 DTR 信号常会让 ESP32 复位重启，固件要 1~3 秒才重新跑起来，
   // 所以先等 1.2 秒再验证，并最多重试 3 次；失败时附上最近收到的串口数据帮助判断。
   function verifyDevice() {
@@ -69,7 +82,13 @@
       };
       cmd('PING', 2500).then(function (d) {
         if (state !== 'ok') return;
-        if (d && d.ok === true) { setWarn(''); return; }
+        if (d && d.ok === true) {
+          fwVer = (d && typeof d.fw === 'string') ? d.fw : '';
+          if (!fwVer) { setWarn('⚠ 未获取到固件版本——固件过旧，请重新烧录最新固件后再使用本页'); return; }
+          if (fwCmp(fwVer, FW_MIN) < 0) { setWarn('⚠ 固件版本 v' + fwVer + ' 过旧（本页需要 v' + FW_MIN + '+，模式4侦测闪烁不可用），请更新固件'); return; }
+          setWarn('');
+          return;
+        }
         fail();
       }).catch(fail);
     }

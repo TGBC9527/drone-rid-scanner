@@ -249,6 +249,7 @@ svg.i .fd{fill:currentColor;stroke:none}
 .dwrap{position:relative;width:12px;height:12px}
 .dwrap.ping::before{content:'';position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px;border-radius:50%;border:2px solid #4CC2FF;animation:pingRing 1.8s ease-out 3}
 @keyframes pingRing{0%{transform:scale(.6);opacity:.9}100%{transform:scale(3.4);opacity:0}}
+@keyframes ppPing{0%{transform:scale(.45);opacity:.85}100%{transform:scale(1.9);opacity:0}}
 .leaflet-popup-content-wrapper{transform-origin:50% 100%;animation:popIn .28s cubic-bezier(.34,1.56,.64,1)}
 @keyframes popIn{from{opacity:0;transform:translateY(10px) scale(.7)}to{opacity:1;transform:none}}
 .leaflet-tooltip{animation:fadeIn .22s ease}
@@ -351,7 +352,7 @@ svg.i .fd{fill:currentColor;stroke:none}
   <button class="btn btn2" id="mapbtn" onclick="toggleMap()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>地图</button>
   <button class="btn btn2" id="beepbtn" onclick="toggleBeep()" title="新目标与失联提示音">提示音:关</button>
 </div>
-<div id="wrap"><div id="mapbox"><div id="mapel"></div><button id="locbtn" class="mp-locbtn" onclick="locateMe()" title="把地图中心移动到我的位置"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></g></svg></button><button id="fsbtn" class="mp-fsbtn" onclick="toggleFs()" title="地图全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><div id="tilehint"></div><button id="mpfit" class="mp-fitbtn" onclick="mpFitAll()" style="display:none" title="缩放到所有目标">自适应</button><div id="mpctl"><div id="mpsc"></div><div id="mplegend"><b onclick="this.parentNode.classList.toggle('min')">图例<span class="lg-arw">▾</span></b><div id="mplg"><div><i style="background:#6CCB5F"></i>信号强（&gt;-70dBm）</div><div><i style="background:#FCE100"></i>信号弱 / 无RSSI</div><div><i style="background:#FF99A4"></i>信号很差</div><div><i style="background:#8a8a8a;opacity:.55"></i>失联 &gt; 5秒</div><div><i style="border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></i>飞手位置</div><div><i style="height:0;width:12px;border-radius:0;border-top:2px solid #4CC2FF"></i>飞行轨迹</div></div></div></div><div id="mpresize" title="拖动调整地图高度"></div><div class="list" id="dl"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div>
+<div id="wrap"><div id="mapbox"><div id="mapel"></div><button id="locbtn" class="mp-locbtn" onclick="locateMe()" title="把地图中心移动到我的位置"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></g></svg></button><button id="fsbtn" class="mp-fsbtn" onclick="toggleFs()" title="地图全屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><div id="tilehint"></div><button id="mpfit" class="mp-fitbtn" onclick="mpFitAll()" style="display:none" title="缩放到所有目标">自适应</button><div id="mpctl"><div id="mpsc"></div><div id="mplegend"><b onclick="this.parentNode.classList.toggle('min')">图例<span class="lg-arw">▾</span></b><div id="mplg"><div><i style="background:#6CCB5F"></i>信号强（&gt;-70dBm）</div><div><i style="background:#FCE100"></i>信号弱 / 无RSSI</div><div><i style="background:#FF99A4"></i>信号很差</div><div><i style="background:#8a8a8a;opacity:.55"></i>失联 &gt; 5秒</div><div><i style="background:#C58AF9;border-radius:50%;box-shadow:0 0 0 1.5px #fff"></i>飞手位置</div><div><i style="height:0;width:12px;border-radius:0;border-top:2px solid #4CC2FF"></i>飞行轨迹</div></div></div></div><div id="mpresize" title="拖动调整地图高度"></div><div id="ovl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21 20H3Z"/><path d="M12 9.5v4.5"/><path d="M12 16.8v.2"/></svg><div id="ovt1">未连接设备</div><div id="ovt2">请点击顶部「连接设备」重新连接；连接后仍无数据请确认已烧录新固件</div></div></div><div class="list" id="dl"></div>
 <div class="lu" id="lu">--</div>
 </section>
 
@@ -416,8 +417,8 @@ svg.i .fd{fill:currentColor;stroke:none}
           <option value="3">关闭</option>
           <option value="4">侦测闪烁（有飞机才闪）</option>
         </select></div>
-      <div class="bar-row" id="ledColorRow" style="display:none"><div class="bt"><span>颜色</span><b id="ledHex">#00FF00</b></div>
-        <input type="color" id="ledColor" value="#00ff00" style="width:100%;height:34px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);border-radius:4px;cursor:pointer"></div>
+      <div class="bar-row" id="ledColorRow" style="display:none"><div class="bt"><span>颜色</span><b id="ledHex">#FF0000</b></div>
+        <input type="color" id="ledColor" value="#ff0000" style="width:100%;height:34px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);border-radius:4px;cursor:pointer"></div>
       <div class="bar-row"><div class="bt"><span>亮度</span><b id="ledBrightV">100%</b></div>
         <input type="range" id="ledBright" min="0" max="100" step="1" value="100" style="width:100%;accent-color:#4CC2FF"></div>
       <div class="bar-row" id="ledSpeedRow" style="display:none"><div class="bt"><span>速度</span><b id="ledSpeedV">50</b></div>
@@ -429,6 +430,7 @@ svg.i .fd{fill:currentColor;stroke:none}
           <option value="1">呼吸：渐亮渐灭循环</option>
           <option value="2">警示双闪：快两连闪+停顿</option>
           <option value="3">心跳：咚-咚——停节奏</option>
+          <option value="4">信号联动：飞机越近闪得越快</option>
         </select>
         <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.5">无飞机时灯全灭；最近 10 秒内收到过飞机信号就开始闪烁提醒。</div></div>
       <div class="bar-row"><div class="bt"><span>开机灯效</span><b id="ledBootV">快速显示保存灯效</b></div>
@@ -450,7 +452,7 @@ svg.i .fd{fill:currentColor;stroke:none}
 </section>
 
 
-<script src="serial.js?v24109"></script>
+<script src="serial.js?v24111"></script>
 <script>
 /* ================= 全局：页面导航 + 串口栏 ================= */
 var cur = null;
@@ -1150,7 +1152,10 @@ function dIcon(col,label,stale,ping){
   return L.divIcon({className:'',iconSize:[12,12],iconAnchor:[6,6],html:'<div class="dwrap'+(ping?' ping':'')+'" style="position:relative;width:12px;height:12px">'+dot+lb+'</div>'});
 }
 function ppIcon(){
-  return L.divIcon({className:'',iconSize:[10,10],iconAnchor:[5,5],html:'<span style="display:block;width:9px;height:9px;border:1.5px solid #C58AF9;background:rgba(197,138,249,.4);border-radius:2px"></span>'});
+  return L.divIcon({className:'',iconSize:[28,28],iconAnchor:[14,14],html:'<span style="display:block;position:relative;width:22px;height:22px;margin:3px">'
+    +'<i style="position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(197,138,249,.6);animation:ppPing 2s ease-out infinite"></i>'
+    +'<i style="position:absolute;inset:0;border-radius:50%;background:#C58AF9;border:3px solid #fff;box-shadow:0 0 0 1.5px rgba(197,138,249,.75),0 2px 8px rgba(0,0,0,.65);font-size:11px;font-weight:700;line-height:16px;text-align:center;color:#fff;font-style:normal">飞</i>'
+    +'</span>'});
 }
 function mpPop(d){
   var noSig=(d.rssi===undefined||d.rssi===null||d.rssi===0);
@@ -1407,9 +1412,9 @@ window.statusStart=function(){sysLoad();if(sysTimer)clearInterval(sysTimer);sysT
 window.statusStop=function(){if(sysTimer){clearInterval(sysTimer);sysTimer=null;}};
 
 /* ---------- RGB 灯效 ---------- */
-var ledColor='#00ff00', ledBright=100;
+var ledColor='#ff0000', ledBright=100;
 var MODE_NAMES={0:'状态联动',1:'单色固定',2:'彩色轮换',3:'关闭',4:'侦测闪烁'};
-var STYLE_NAMES={0:'硬闪',1:'呼吸',2:'警示双闪',3:'心跳'};
+var STYLE_NAMES={0:'硬闪',1:'呼吸',2:'警示双闪',3:'心跳',4:'信号联动'};
 function hex2rgb(h){h=h.replace('#','');var n=parseInt(h,16)||0;return [n>>16&255,n>>8&255,n&255];}
 function rgb2hex(r,g,b){function p(v){v=Math.max(0,Math.min(255,v|0));return(v<16?'0':'')+v.toString(16);}return '#'+p(r)+p(g)+p(b);}
 function ledCfgLoad(){
@@ -1429,10 +1434,11 @@ function ledSyncUI(){
   var m=parseInt(document.getElementById('ledMode').value,10);
   document.getElementById('ledModeV').textContent=MODE_NAMES[m]||('模式'+m);
   document.getElementById('ledColorRow').style.display=(m===1||m===4)?'block':'none';
+  var sv2=document.getElementById('ledStyle');
   var sr=document.getElementById('ledStyleRow');
-  if(sr){sr.style.display=(m===4)?'flex':'none';var sv2=document.getElementById('ledStyle');if(sv2)document.getElementById('ledStyleV').textContent=STYLE_NAMES[sv2.value]||'硬闪';}
+  if(sr){sr.style.display=(m===4)?'flex':'none';if(sv2)document.getElementById('ledStyleV').textContent=STYLE_NAMES[sv2.value]||'硬闪';}
   sr=document.getElementById('ledSpeedRow');
-  if(sr)sr.style.display=(m===2||m===4)?'flex':'none';
+  if(sr)sr.style.display=(m===2||(m===4&&sv2&&sv2.value!=='4'))?'flex':'none';
   var b=parseInt(document.getElementById('ledBright').value,10);
   document.getElementById('ledBrightV').textContent=b+'%';
   var sv=document.getElementById('ledSpeed');if(sv)document.getElementById('ledSpeedV').textContent=sv.value;
